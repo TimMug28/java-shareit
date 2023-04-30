@@ -2,12 +2,9 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
@@ -24,7 +21,6 @@ public class UserController {
     public UserDto createUser(@Valid @RequestBody UserDto userDto) {
         log.info("POST /users - создание пользователя");
         return userService.createUser(userDto);
-        // return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -35,8 +31,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public UserDto findUserById(
-            @PathVariable Integer id
-    ) {
+            @PathVariable Integer id) {
         log.info("GET /users/{} - пользователь", id);
         return userService.findUserById(id);
     }
@@ -49,17 +44,9 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    UserDto updateInStorage(@PathVariable Integer userId) {
-        return userService.updateUser(userId);
+    UserDto updateInStorage(@PathVariable Integer userId,
+                            @RequestBody UserDto userDto) {
+        log.info("PATCH /users/{} - запрос на изменение пользователя.", userId);
+        return userService.updateUser(userId, userDto);
     }
-
-
-//
-//
-
-//
-
-//
-//    // удалить пользователя
-
 }

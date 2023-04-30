@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user.repository;
 
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
@@ -10,7 +9,7 @@ import java.util.List;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
-    private HashMap <Integer, User> users = new HashMap<>();
+    private HashMap<Integer, User> users = new HashMap<>();
     private Integer id = 1;
 
 
@@ -32,25 +31,36 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User updateUser(User user) {
+    public User updateUser(Integer id, User user) {
+        User updateUser = users.get(id);
 
-        final Integer inputId = user.getId();
-        final String inputName = user.getName();
-        final String inputEmail = user.getEmail();
+        if (user.getName() != null) {
+            updateUser.setName(user.getName());
+        }
+        if (user.getEmail() != null) {
+            updateUser.setEmail(user.getEmail());
+        }
 
-        User updateUser = users.get(inputId);
-
-        users.put(inputId, updateUser);
+        users.put(id, updateUser);
         return updateUser;
     }
 
     @Override
     public void removeUserById(Integer id) {
-         users.remove(id);
+        users.remove(id);
     }
 
     @Override
-    public Long getUserIdByEmail(String email) {
+    public Integer getUserIdByEmail(String email) {
+        if (email == null) {
+            return null;
+        }
+        for (User user : users.values()) {
+            String email1 = user.getEmail();
+            if (email1.equals(email)) {
+                return user.getId();
+            }
+        }
         return null;
     }
 }

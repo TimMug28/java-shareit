@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.shareit.exceptions.ConflictException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 
@@ -24,10 +25,16 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    //500
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handlerException(final RuntimeException e) {
-        return new ErrorResponse("Произошла непредвиденная ошибка.");
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleForConflict(final ConflictException e) {
+        return new ErrorResponse(e.getMessage());
     }
+
+    //500
+//    @ExceptionHandler
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    public ErrorResponse handlerException(final RuntimeException e) {
+//        return new ErrorResponse("Произошла непредвиденная ошибка.");
+//    }
 }

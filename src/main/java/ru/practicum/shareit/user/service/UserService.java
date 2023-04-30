@@ -2,9 +2,9 @@ package ru.practicum.shareit.user.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exceptions.ConflictException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidateUtil;
-import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -18,7 +18,12 @@ import java.util.List;
 public class UserService {
     UserRepository userRepository;
 
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     public UserDto createUser(UserDto user) {
+        validateEmail(UserMapper.toUser(user));
         User user1 = UserMapper.toUser(user);
         UserDto createdUser = UserMapper.toUserDto(userRepository.createUser(user1));
         log.info("Добавлен новый пользователь: {}", createdUser);
@@ -55,9 +60,28 @@ public class UserService {
         userRepository.removeUserById(id);
     }
 
-    public UserDto updateUser(Integer id) {
-        UserDto userDto = findUserById(id);
-        User user = userRepository.updateUser(UserMapper.toUser(userDto));
-        return null;
+    public UserDto updateUser(Integer id, UserDto userDto) {
+        User user = UserMapper.toUser(userDto);
+        user.setId(id);
+        validateId(user);
+        validateEmail(user);
+        user = userRepository.updateUser(id, user);
+        return UserMapper.toUserDto(user);
+    }
+
+    private void validateEmail(User user) {
+        Integer id = userRepository.getUserIdByEmail(user.getEmail());
+        if (id != null && !user.getId().equals(id)) {
+            log.info("Ошибка, данный Email уже занят.");
+            throw new ConflictException("Повторное использование Email.");
+        }
+    }
+
+    private void validateId(User user) {
+        Integer id = user.getId();
+        if (id == null) {
+            log.info("id пользователя " + user + " равен null.");
+            throw new NotFoundException("id пользователя равен null.");
+        }
     }
 }
