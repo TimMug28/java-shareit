@@ -3,9 +3,6 @@ package ru.practicum.shareit.item.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 public class Item {
     private Integer id;

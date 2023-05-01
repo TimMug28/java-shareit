@@ -1,12 +1,8 @@
 package ru.practicum.shareit.user.model;
 
+import javax.validation.constraints.Email;
 import lombok.Data;
 
-import javax.validation.constraints.Email;
-
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 public class User {
     private Integer id;
