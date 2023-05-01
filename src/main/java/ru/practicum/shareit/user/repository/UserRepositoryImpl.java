@@ -40,7 +40,6 @@ public class UserRepositoryImpl implements UserRepository {
         if (user.getEmail() != null) {
             updateUser.setEmail(user.getEmail());
         }
-
         users.put(id, updateUser);
         return updateUser;
     }
@@ -56,8 +55,8 @@ public class UserRepositoryImpl implements UserRepository {
             return null;
         }
         for (User user : users.values()) {
-            String email1 = user.getEmail();
-            if (email1.equals(email)) {
+            String userEmail = user.getEmail();
+            if (userEmail.equals(email)) {
                 return user.getId();
             }
         }

@@ -31,10 +31,10 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-   // 500
-//    @ExceptionHandler
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    public ErrorResponse handlerException(final RuntimeException e) {
-//        return new ErrorResponse("Произошла непредвиденная ошибка.");
-//    }
+    //500
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handlerException(final RuntimeException e) {
+        return new ErrorResponse("Произошла непредвиденная ошибка.");
+    }
 }

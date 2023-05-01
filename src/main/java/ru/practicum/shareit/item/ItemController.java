@@ -6,9 +6,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * TODO Sprint add-controllers.
@@ -33,16 +33,24 @@ public class ItemController {
         return itemService.findItemById(itemId);
     }
 
-//    @GetMapping()
-//    public List<ItemDto> getAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
-//        return itemService.getAllItems(userId);
-//    }
+    @GetMapping()
+    public List<ItemDto> getAllItems(@RequestHeader("X-Sharer-User-Id") Integer owner) {
+        return itemService.getAllItems(owner);
+    }
 
     @PatchMapping("{itemId}")
     public ItemDto updateItem(@RequestHeader(value = "X-Sharer-User-Id", required = false) Integer owner,
-                              @PathVariable  Integer itemId,
-                              @RequestBody ItemDto itemDto)  {
+                              @PathVariable Integer itemId,
+                              @RequestBody ItemDto itemDto) {
         log.info("PATCH /items - создание изменение вещи.");
         return itemService.updateItem(itemId, owner, itemDto);
+    }
+
+    @GetMapping("/search")
+    public Set<ItemDto> searchForItemByDescription(@RequestHeader(value = "X-Sharer-User-Id", required = false) Integer owner,
+                                                   @RequestParam(defaultValue = "null") String text
+    ) {
+        log.info("GET /items/search?text= " + text);
+        return itemService.searchForItemByDescription(text, owner);
     }
 }

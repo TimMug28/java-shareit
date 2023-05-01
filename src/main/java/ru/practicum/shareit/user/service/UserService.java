@@ -31,12 +31,12 @@ public class UserService {
     }
 
     public List<UserDto> findAllUsers() {
-        log.info("Запрос списка всех пользователей");
         List<UserDto> usersDto = new ArrayList<>();
         List<User> users = userRepository.findAllUsers();
         for (User user : users) {
             usersDto.add(UserMapper.toUserDto(user));
         }
+        log.info("Запрос списка всех пользователей");
         return usersDto;
     }
 
@@ -58,6 +58,7 @@ public class UserService {
             ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", id));
         }
         userRepository.removeUserById(id);
+        log.info("Удалён пользователь c id={}.", id);
     }
 
     public UserDto updateUser(Integer id, UserDto userDto) {
@@ -66,6 +67,7 @@ public class UserService {
         validateId(user);
         validateEmail(user);
         user = userRepository.updateUser(id, user);
+        log.info("Изменен пользователь c id={}.", id);
         return UserMapper.toUserDto(user);
     }
 

@@ -1,10 +1,9 @@
 package ru.practicum.shareit.item.repository;
 
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.HashMap;
+import java.util.*;
 
 @Repository
 public class ItemRepositoryImpl implements ItemRepository {
@@ -40,4 +39,28 @@ public class ItemRepositoryImpl implements ItemRepository {
         return updateItem;
     }
 
+    @Override
+    public List<Item> getAllItems(Integer owner) {
+        List<Item> itemsList = new ArrayList<>();
+        for (Item item : items.values()) {
+            if (item.getOwner().equals(owner)) {
+                itemsList.add(item);
+            }
+        }
+        return itemsList;
+    }
+
+    @Override
+    public Set<Item> searchForItemByDescription(String text) {
+        Set<Item> foundItems = new LinkedHashSet<>();
+        for (Item item : items.values()) {
+            if (item.getName().toLowerCase().contains(text.toLowerCase()) || item.getDescription().toLowerCase()
+                    .contains(text.toLowerCase())) {
+                if (item.getAvailable()) {
+                    foundItems.add(item);
+                }
+            }
+        }
+        return foundItems;
+    }
 }

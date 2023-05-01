@@ -9,12 +9,9 @@ import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.user.UserMapper;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -49,18 +46,45 @@ public class ItemService {
     }
 
     public ItemDto updateItem(Integer id, Integer owner, ItemDto itemDto) {
+        if (owner == null) {
+            throw new ValidationException("Не указан владелец вещи.");
+        }
         ItemDto itemDtoOld = findItemById(id);
         if (itemDtoOld == null) {
             ValidateUtil.throwNotFound(String.format("Вещь с %d не найдена.", id));
             return null;
         }
-        if (!Objects.equals(itemDtoOld.getOwner(), owner)){
+        if (!Objects.equals(itemDtoOld.getOwner(), owner)) {
             throw new NotFoundException("Редактировать вещь может только её владелец.");
         }
         Item item = ItemMapper.toItem(itemDto);
         validateUser(owner);
         Item updateItem = itemRepository.updateItem(id, item);
+        log.info("Отредактирована вещь c id={}.", id);
         return ItemMapper.toItemDto(updateItem);
+    }
+
+    public List<ItemDto> getAllItems(Integer owner) {
+        validateUser(owner);
+        List<ItemDto> itemDtoList = new ArrayList<>();
+        List<Item> itemList = itemRepository.getAllItems(owner);
+        for (Item item : itemList) {
+            itemDtoList.add(ItemMapper.toItemDto(item));
+        }
+        log.info("Получен список всех вещей.");
+        return itemDtoList;
+    }
+
+    public Set<ItemDto> searchForItemByDescription(String text, Integer owner) {
+        Set<ItemDto> itemDtoList = new LinkedHashSet<>();
+        validateUser(owner);
+        String description = text.toLowerCase();
+        Set<Item> itemList = itemRepository.searchForItemByDescription(description);
+        for (Item item : itemList) {
+            itemDtoList.add(ItemMapper.toItemDto(item));
+        }
+        log.info("Запрошены вещи по ключевому слову={}.", description);
+        return itemDtoList;
     }
 
     private void validate(Item item) {
@@ -68,17 +92,14 @@ public class ItemService {
             log.info("Пустое поле owner.");
             throw new ValidationException("Поле owner не может быть пустым.");
         }
-
         if (item.getName() == null || item.getName().isBlank()) {
             log.info("Пустое поле name.");
             throw new ValidationException("Поле name не может быть пустым.");
         }
-
         if (item.getDescription() == null || item.getDescription().isBlank()) {
             log.info("Пустое поле description.");
             throw new ValidationException("Поле description не может быть пустым.");
         }
-
         if (item.getAvailable() == null) {
             log.info("Пустое поле available.");
             throw new ValidationException("Поле available не может быть пустым.");
