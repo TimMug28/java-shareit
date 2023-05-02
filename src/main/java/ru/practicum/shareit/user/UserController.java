@@ -44,8 +44,8 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    UserDto updateInStorage(@PathVariable Integer userId,
-                            @RequestBody UserDto userDto) {
+    UserDto updateUser(@PathVariable Integer userId,
+                       @RequestBody UserDto userDto) {
         log.info("PATCH /users/{} - запрос на изменение пользователя.", userId);
         return userService.updateUser(userId, userDto);
     }
