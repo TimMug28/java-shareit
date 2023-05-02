@@ -32,7 +32,7 @@ public class UserTests {
     }
 
     @Test
-    void createUser() {
+    void testCreateUser() {
         UserDto userDto = UserMapper.toUserDto(user);
         userService.createUser(userDto);
         List<UserDto> userDtoList = userService.findAllUsers();
@@ -40,7 +40,7 @@ public class UserTests {
     }
 
     @Test
-    void findAllUsers() {
+    void testFindAllUsers() {
         UserDto userDto = UserMapper.toUserDto(user);
         UserDto userDto2 = UserMapper.toUserDto(user2);
         userService.createUser(userDto);
@@ -50,7 +50,7 @@ public class UserTests {
     }
 
     @Test
-    void updateUser() {
+    void testUpdateUser() {
         UserDto userDto = UserMapper.toUserDto(user);
         UserDto userDto2 = UserMapper.toUserDto(user2);
         userService.createUser(userDto);
@@ -60,7 +60,7 @@ public class UserTests {
     }
 
     @Test
-    void removeUser() {
+    void testRemoveUser() {
         UserDto userDto = UserMapper.toUserDto(user);
         userService.createUser(userDto);
         List<UserDto> userDtoList = userService.findAllUsers();

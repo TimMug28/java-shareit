@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
@@ -14,15 +15,11 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.util.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class ItemService {
-    ItemRepository itemRepository;
-    UserRepository userRepository;
-
-    public ItemService(ItemRepository itemRepository, UserRepository userRepository) {
-        this.itemRepository = itemRepository;
-        this.userRepository = userRepository;
-    }
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
 
     public ItemDto createItem(ItemDto itemDto, Integer owner) {
         itemDto.setOwner(owner);

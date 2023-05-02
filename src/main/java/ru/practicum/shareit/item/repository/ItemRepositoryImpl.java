@@ -8,7 +8,7 @@ import java.util.*;
 @Repository
 public class ItemRepositoryImpl implements ItemRepository {
 
-    private HashMap<Integer, Item> items = new HashMap<>();
+    private final HashMap<Integer, Item> items = new HashMap<>();
     private Integer id = 1;
 
     @Override
