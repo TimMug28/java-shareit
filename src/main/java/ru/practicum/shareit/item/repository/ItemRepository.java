@@ -9,11 +9,11 @@ public interface ItemRepository {
 
     Item createItem(Item item);
 
-    Item findItemById(Integer id);
+    Item findItemById(Long id);
 
-    Item updateItem(Integer id, Item item);
+    Item updateItem(Long id, Item item);
 
-    List<Item> getAllItems(Integer owner);
+    List<Item> getAllItems(Long owner);
 
     Set<Item> searchForItemByDescription(String text);
 }

@@ -31,20 +31,20 @@ public class UserController {
 
     @GetMapping("/{id}")
     public UserDto findUserById(
-            @PathVariable Integer id) {
+            @PathVariable Long id) {
         log.info("GET /users/{} - пользователь", id);
         return userService.findUserById(id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> removeUser(@PathVariable Integer id) {
+    public ResponseEntity<String> removeUser(@PathVariable Long id) {
         log.info("DELETE /users/{} - запрос на удаление пользователя.", id);
         userService.removeUserById(id);
         return ResponseEntity.ok("Пользователь удален.");
     }
 
     @PatchMapping("/{userId}")
-    UserDto updateUser(@PathVariable Integer userId,
+    UserDto updateUser(@PathVariable Long userId,
                        @RequestBody UserDto userDto) {
         log.info("PATCH /users/{} - запрос на изменение пользователя.", userId);
         return userService.updateUser(userId, userDto);

@@ -21,33 +21,33 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader(value = "X-Sharer-User-Id", required = false) Integer owner,
+    public ItemDto createItem(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long owner,
                               @RequestBody @Validated ItemDto itemDto) {
         log.info("POST /items - создание новой вещи.");
         return itemService.createItem(itemDto, owner);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto findItemById(@PathVariable Integer itemId) {
+    public ItemDto findItemById(@PathVariable Long itemId) {
         log.info("GET /items - запрос вещи по id.");
         return itemService.findItemById(itemId);
     }
 
     @GetMapping()
-    public List<ItemDto> getAllItems(@RequestHeader("X-Sharer-User-Id") Integer owner) {
+    public List<ItemDto> getAllItems(@RequestHeader("X-Sharer-User-Id") Long owner) {
         return itemService.getAllItems(owner);
     }
 
     @PatchMapping("{itemId}")
-    public ItemDto updateItem(@RequestHeader(value = "X-Sharer-User-Id", required = false) Integer owner,
-                              @PathVariable Integer itemId,
+    public ItemDto updateItem(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long owner,
+                              @PathVariable Long itemId,
                               @RequestBody ItemDto itemDto) {
         log.info("PATCH /items - создание изменение вещи.");
         return itemService.updateItem(itemId, owner, itemDto);
     }
 
     @GetMapping("/search")
-    public Set<ItemDto> searchForItemByDescription(@RequestHeader(value = "X-Sharer-User-Id", required = false) Integer owner,
+    public Set<ItemDto> searchForItemByDescription(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long owner,
                                                    @RequestParam(defaultValue = "null") String text
     ) {
         log.info("GET /items/search?text= " + text);

@@ -8,8 +8,8 @@ import java.util.*;
 @Repository
 public class ItemRepositoryImpl implements ItemRepository {
 
-    private final HashMap<Integer, Item> items = new HashMap<>();
-    private Integer id = 1;
+    private final HashMap<Long, Item> items = new HashMap<>();
+    private Long id = 1L;
 
     @Override
     public Item createItem(Item item) {
@@ -19,12 +19,12 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public Item findItemById(Integer id) {
+    public Item findItemById(Long id) {
         return items.get(id);
     }
 
     @Override
-    public Item updateItem(Integer id, Item item) {
+    public Item updateItem(Long id, Item item) {
         Item updateItem = items.get(id);
         if (item.getName() != null) {
             updateItem.setName(item.getName());
@@ -40,10 +40,10 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public List<Item> getAllItems(Integer owner) {
+    public List<Item> getAllItems(Long owner) {
         List<Item> itemsList = new ArrayList<>();
         for (Item item : items.values()) {
-            if (item.getOwner().equals(owner)) {
+            if (item.getOwner().getId().equals(owner)) {
                 itemsList.add(item);
             }
         }

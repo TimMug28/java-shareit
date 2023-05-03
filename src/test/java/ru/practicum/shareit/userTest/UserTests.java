@@ -8,6 +8,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepositoryImpl;
 import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class UserTests {
 
     @BeforeEach
     void start() {
-        userService = new UserService(new UserRepositoryImpl());
+        userService = new UserServiceImpl(new UserRepositoryImpl());
         user = new User();
         user2 = new User();
         user.setName("Bob");
@@ -54,8 +55,8 @@ public class UserTests {
         UserDto userDto = UserMapper.toUserDto(user);
         UserDto userDto2 = UserMapper.toUserDto(user2);
         userService.createUser(userDto);
-        userService.updateUser(1, userDto2);
-        UserDto updateUser = userService.findUserById(1);
+        userService.updateUser(1L, userDto2);
+        UserDto updateUser = userService.findUserById(1L);
         assertEquals("Sam", updateUser.getName());
     }
 
@@ -65,7 +66,7 @@ public class UserTests {
         userService.createUser(userDto);
         List<UserDto> userDtoList = userService.findAllUsers();
         assertEquals(1, userDtoList.size());
-        userService.removeUserById(1);
+        userService.removeUserById(1L);
         List<UserDto> userDtoList1 = userService.findAllUsers();
         assertEquals(0, userDtoList1.size());
     }

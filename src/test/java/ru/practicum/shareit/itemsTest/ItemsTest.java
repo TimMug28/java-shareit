@@ -10,6 +10,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepositoryImpl;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.item.service.ItemServiceImpl;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepositoryImpl;
 
@@ -31,7 +32,7 @@ public class ItemsTest {
     @BeforeEach
     void start() {
         userService = new UserRepositoryImpl();
-        itemService = new ItemService(new ItemRepositoryImpl(), userService);
+        itemService = new ItemServiceImpl(new ItemRepositoryImpl(), userService);
         item = new Item();
         item1 = new Item();
         user = new User();
@@ -41,18 +42,18 @@ public class ItemsTest {
         item.setName("Дрель");
         item.setDescription("супер дрель");
         item.setAvailable(true);
-        item.setOwner(1);
+        item.setOwner(user);
         item1.setName("Отвертка");
         item1.setDescription("супер отвертка");
         item1.setAvailable(true);
-        item1.setOwner(1);
+        item1.setOwner(user);
     }
 
     @Test
     void testCreatedItem() {
         ItemDto itemDto = ItemMapper.toItemDto(item);
-        itemService.createItem(itemDto, 1);
-        List<ItemDto> itemDtoList = itemService.getAllItems(1);
+        itemService.createItem(itemDto, 1L);
+        List<ItemDto> itemDtoList = itemService.getAllItems(1L);
         assertEquals(1, itemDtoList.size());
 
     }
@@ -60,9 +61,9 @@ public class ItemsTest {
     @Test
     void testUpdateItem() {
         ItemDto itemDto = ItemMapper.toItemDto(item);
-        ItemDto createdItem = itemService.createItem(itemDto, 1);
+        ItemDto createdItem = itemService.createItem(itemDto, 1L);
         ItemDto itemDto1 = ItemMapper.toItemDto(item1);
-        ItemDto savedItem = itemService.updateItem(createdItem.getId(), 1, itemDto1);
+        ItemDto savedItem = itemService.updateItem(createdItem.getId(), 1L, itemDto1);
         assertEquals(savedItem.getId(), createdItem.getId());
         assertEquals(savedItem.getName(), item1.getName());
         assertEquals(savedItem.getDescription(), item1.getDescription());
@@ -72,7 +73,7 @@ public class ItemsTest {
     @Test
     void testFindItemById() {
         ItemDto itemDto = ItemMapper.toItemDto(item);
-        ItemDto createdItem = itemService.createItem(itemDto, 1);
+        ItemDto createdItem = itemService.createItem(itemDto, 1L);
         ItemDto foundItem = itemService.findItemById(createdItem.getId());
         assertNotNull(foundItem);
         assertEquals(createdItem.getId(), foundItem.getId());
@@ -84,18 +85,18 @@ public class ItemsTest {
     @Test
     void testGetAllItems() {
         ItemDto itemDto = ItemMapper.toItemDto(item);
-        ItemDto createdItem = itemService.createItem(itemDto, 1);
-        List<ItemDto> itemDtoList = itemService.getAllItems(1);
+        ItemDto createdItem = itemService.createItem(itemDto, 1L);
+        List<ItemDto> itemDtoList = itemService.getAllItems(1L);
         assertEquals(1, itemDtoList.size());
     }
 
     @Test
     void testSearchForItemByDescription() {
         ItemDto itemDto = ItemMapper.toItemDto(item);
-        ItemDto createdItem = itemService.createItem(itemDto, 1);
+        ItemDto createdItem = itemService.createItem(itemDto, 1L);
         ItemDto itemDto1 = ItemMapper.toItemDto(item1);
-        ItemDto createdItem1 = itemService.createItem(itemDto1, 1);
-        Set<ItemDto> itemDtoSet = itemService.searchForItemByDescription("дрель", 1);
+        ItemDto createdItem1 = itemService.createItem(itemDto1, 1L);
+        Set<ItemDto> itemDtoSet = itemService.searchForItemByDescription("дрель", 1L);
         ItemDto foundItem = itemDtoSet.iterator().next();
         assertNotNull(itemDtoSet);
         assertEquals(createdItem.getId(), foundItem.getId());

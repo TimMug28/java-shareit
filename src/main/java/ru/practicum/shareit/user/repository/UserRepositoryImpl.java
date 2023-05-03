@@ -9,8 +9,8 @@ import java.util.List;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
-    private HashMap<Integer, User> users = new HashMap<>();
-    private Integer id = 1;
+    private final HashMap<Long, User> users = new HashMap<>();
+    private Long id = 1L;
 
 
     @Override
@@ -21,7 +21,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User getUserById(Integer id) {
+    public User getUserById(Long id) {
         return users.get(id);
     }
 
@@ -31,7 +31,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User updateUser(Integer id, User user) {
+    public User updateUser(Long id, User user) {
         User updateUser = users.get(id);
 
         if (user.getName() != null) {
@@ -45,12 +45,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void removeUserById(Integer id) {
+    public void removeUserById(Long id) {
         users.remove(id);
     }
 
     @Override
-    public Integer getUserIdByEmail(String email) {
+    public Long getUserIdByEmail(String email) {
         if (email == null) {
             return null;
         }
