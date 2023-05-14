@@ -15,6 +15,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,20 +34,20 @@ public class ItemServiceImpl implements ItemService {
         itemDto.setOwner(user);
         validate(ItemMapper.toItem(itemDto));
         Item item = ItemMapper.toItem(itemDto);
-        ItemDto createdItem = ItemMapper.toItemDto(itemRepository.createItem(item));
+        ItemDto createdItem = ItemMapper.toItemDto(itemRepository.save(item));
         log.info("Добавлена новая вещь: {}", createdItem);
         return createdItem;
     }
 
     public ItemDto findItemById(Long id) {
         ValidateUtil.validNumberNotNull(id, "id вещи не должно быть null.");
-        Item item = itemRepository.findItemById(id);
-        if (item == null) {
+        Optional<Item> item = itemRepository.findById(id);
+        if (item.isEmpty()) {
             ValidateUtil.throwNotFound(String.format("Вещь с %d не найдена.", id));
             return null;
         }
         log.info("Запрошена вещь c id={}.", id);
-        return ItemMapper.toItemDto(item);
+        return ItemMapper.toItemDto(item.get());
     }
 
     public ItemDto updateItem(Long id, Long owner, ItemDto itemDto) {
@@ -63,15 +64,16 @@ public class ItemServiceImpl implements ItemService {
         }
         Item item = ItemMapper.toItem(itemDto);
         validateUser(owner);
-        Item updateItem = itemRepository.updateItem(id, item);
+        Item updateItem = itemRepository.save(item);
         log.info("Отредактирована вещь c id={}.", id);
         return ItemMapper.toItemDto(updateItem);
     }
 
     public List<ItemDto> getAllItems(Long owner) {
         validateUser(owner);
-        List<Item> itemList = itemRepository.getAllItems(owner);
-        log.info("Получен список всех вещей.");
+        User user = userRepository.getReferenceById(owner);
+        List<Item> itemList = itemRepository.findAllByOwnerOrderById(user);
+        log.info("Получен список всех вещей пользователя с id = " + user.getId());
         return itemList
                 .stream()
                 .map(ItemMapper::toItemDto)
@@ -81,11 +83,12 @@ public class ItemServiceImpl implements ItemService {
     public Set<ItemDto> searchForItemByDescription(String text, Long owner) {
         validateUser(owner);
         String description = text.toLowerCase();
-        Set<Item> itemList = itemRepository.searchForItemByDescription(description);
+        Set<Item> itemList = itemRepository.searchItemsByDescription(text);
         log.info("Запрошены вещи по ключевому слову={}.", description);
         return itemList
                 .stream()
                 .map(ItemMapper::toItemDto)
+                .filter(ItemDto::getAvailable)
                 .collect(Collectors.toSet());
     }
 
@@ -109,7 +112,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void validateUser(Long owner) {
-        if (userRepository.getReferenceById(owner) == null) {
+        User user = userRepository.getReferenceById(owner);
+        if (user == null) {
             log.info("Пользователь с id: {}, не найден ", owner);
             throw new NotFoundException("Отсутствует пользователь с заданным идентификатором.");
         }

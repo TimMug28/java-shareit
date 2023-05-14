@@ -6,16 +6,19 @@ import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 
 @Data
 @Entity
-@Table(name = "items")
+@Table(name = "items", schema = "public")
 public class Item {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+    @NotBlank
     @Column(name = "item_name")
     private String name;
     @Column(name = "description")
