@@ -29,7 +29,7 @@ public class ItemServiceImpl implements ItemService {
         if (owner != null) {
             validateUser(owner);
         }
-        User user = userRepository.getUserById(owner);
+        User user = userRepository.getReferenceById(owner);
         itemDto.setOwner(user);
         validate(ItemMapper.toItem(itemDto));
         Item item = ItemMapper.toItem(itemDto);
@@ -109,7 +109,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void validateUser(Long owner) {
-        if (userRepository.getUserById(owner) == null) {
+        if (userRepository.getReferenceById(owner) == null) {
             log.info("Пользователь с id: {}, не найден ", owner);
             throw new NotFoundException("Отсутствует пользователь с заданным идентификатором.");
         }

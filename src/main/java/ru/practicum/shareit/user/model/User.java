@@ -2,6 +2,8 @@ package ru.practicum.shareit.user.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+
 import lombok.Data;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.item.model.Item;
@@ -11,14 +13,17 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "users")
+@Table(name = "users", schema = "public")
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+    @NotBlank
     @Column(name = "user_name")
     private String name;
     @Email
+    @NotBlank
     @Column(name = "email")
     private String email;
     @OneToMany(mappedBy = "owner")
@@ -27,4 +32,6 @@ public class User {
     private List<ItemRequest> requests;
     @OneToMany(mappedBy = "booker")
     private List<Booking> bookings;
+//    @OneToMany(mappedBy = "author")
+//    private List<String> comments;
 }

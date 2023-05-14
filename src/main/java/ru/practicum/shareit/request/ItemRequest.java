@@ -19,11 +19,12 @@ public class ItemRequest {
     private Integer id;
     @Column(name = "description")
     private String description;
-    @ManyToOne
-    @JoinColumn(name = "requester_id")
-    private User requestor;
+    @Column(name = "requester_id")
+    private Integer requestor;
     @Column(name = "created_date")
     private LocalDateTime created;
-    @OneToOne(mappedBy = "request")
+    @OneToOne
+    @JoinColumn(name = "item_id")
     private Item item;
 }
+

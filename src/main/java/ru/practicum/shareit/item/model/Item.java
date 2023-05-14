@@ -30,3 +30,4 @@ public class Item {
     @OneToMany(mappedBy = "item")
     private List<Booking> bookings;
 }
+

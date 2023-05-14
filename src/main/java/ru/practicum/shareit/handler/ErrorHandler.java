@@ -32,9 +32,9 @@ public class ErrorHandler {
     }
 
     //500
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handlerException(final RuntimeException e) {
-        return new ErrorResponse("Произошла непредвиденная ошибка.");
-    }
+//    @ExceptionHandler
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    public ErrorResponse handlerException(final RuntimeException e) {
+//        return new ErrorResponse("Произошла непредвиденная ошибка.");
+//    }
 }
