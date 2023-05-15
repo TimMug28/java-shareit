@@ -6,6 +6,7 @@ import javax.validation.constraints.NotBlank;
 
 import lombok.Data;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.ItemRequest;
 
@@ -28,10 +29,8 @@ public class User {
     private String email;
     @OneToMany(mappedBy = "owner")
     private List<Item> items;
-    @OneToMany(mappedBy = "requestor")
-    private List<ItemRequest> requests;
     @OneToMany(mappedBy = "booker")
     private List<Booking> bookings;
-//    @OneToMany(mappedBy = "author")
-//    private List<String> comments;
+    @OneToMany(mappedBy = "author")
+    private List<Comment> comments;
 }

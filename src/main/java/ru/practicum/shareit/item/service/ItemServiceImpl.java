@@ -10,8 +10,9 @@ import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.util.List;
 import java.util.Objects;
@@ -24,16 +25,17 @@ import java.util.stream.Collectors;
 @Service
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
-    private final UserRepository userRepository;
+    private final UserServiceImpl userService;
 
     public ItemDto createItem(ItemDto itemDto, Long owner) {
-        if (owner != null) {
-            validateUser(owner);
-        }
-        User user = userRepository.getReferenceById(owner);
-        itemDto.setOwner(user);
-        validate(ItemMapper.toItem(itemDto));
         Item item = ItemMapper.toItem(itemDto);
+        if (owner == null) {
+            log.info("Пустое поле owner.");
+            throw new ValidationException("Поле owner не может быть пустым.");
+        }
+        validate(item);
+        User user = UserMapper.toUser(userService.findUserById(owner));
+        item.setOwner(user);
         ItemDto createdItem = ItemMapper.toItemDto(itemRepository.save(item));
         log.info("Добавлена новая вещь: {}", createdItem);
         return createdItem;
@@ -54,24 +56,34 @@ public class ItemServiceImpl implements ItemService {
         if (owner == null) {
             throw new ValidationException("Не указан владелец вещи.");
         }
-        ItemDto itemDtoOld = findItemById(id);
-        if (itemDtoOld == null) {
+        Optional<Item> item = itemRepository.findById(id);
+        if (item.isEmpty()) {
             ValidateUtil.throwNotFound(String.format("Вещь с %d не найдена.", id));
             return null;
         }
-        if (!Objects.equals(itemDtoOld.getOwner().getId(), owner)) {
+        Item itemOld = item.get();
+        if (!Objects.equals(itemOld.getOwner().getId(), owner)) {
             throw new NotFoundException("Редактировать вещь может только её владелец.");
         }
-        Item item = ItemMapper.toItem(itemDto);
-        validateUser(owner);
-        Item updateItem = itemRepository.save(item);
+        if (itemDto.getName() != null) {
+            itemOld.setName(itemDto.getName());
+        }
+        if (itemDto.getDescription() != null) {
+            itemOld.setDescription(itemDto.getDescription());
+        }
+        if (itemDto.getAvailable() != null) {
+            itemOld.setAvailable(itemDto.getAvailable());
+        }
+        if (itemDto.getRequest() != null) {
+            itemOld.setRequest(itemDto.getRequest().getId());
+        }
+        ItemDto updateItem = ItemMapper.toItemDto(itemRepository.save(itemOld));
         log.info("Отредактирована вещь c id={}.", id);
-        return ItemMapper.toItemDto(updateItem);
+        return updateItem;
     }
 
     public List<ItemDto> getAllItems(Long owner) {
-        validateUser(owner);
-        User user = userRepository.getReferenceById(owner);
+        User user = UserMapper.toUser(userService.findUserById(owner));
         List<Item> itemList = itemRepository.findAllByOwnerOrderById(user);
         log.info("Получен список всех вещей пользователя с id = " + user.getId());
         return itemList
@@ -81,7 +93,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public Set<ItemDto> searchForItemByDescription(String text, Long owner) {
-        validateUser(owner);
         String description = text.toLowerCase();
         Set<Item> itemList = itemRepository.searchItemsByDescription(text);
         log.info("Запрошены вещи по ключевому слову={}.", description);
@@ -93,10 +104,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void validate(Item item) {
-        if (item.getOwner() == null) {
-            log.info("Пустое поле owner.");
-            throw new ValidationException("Поле owner не может быть пустым.");
-        }
         if (item.getName() == null || item.getName().isBlank()) {
             log.info("Пустое поле name.");
             throw new ValidationException("Поле name не может быть пустым.");
@@ -108,14 +115,6 @@ public class ItemServiceImpl implements ItemService {
         if (item.getAvailable() == null) {
             log.info("Пустое поле available.");
             throw new ValidationException("Поле available не может быть пустым.");
-        }
-    }
-
-    private void validateUser(Long owner) {
-        User user = userRepository.getReferenceById(owner);
-        if (user == null) {
-            log.info("Пользователь с id: {}, не найден ", owner);
-            throw new NotFoundException("Отсутствует пользователь с заданным идентификатором.");
         }
     }
 }

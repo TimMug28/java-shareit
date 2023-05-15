@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class ItemRequest {
     @Id
     @Column(name = "id")
-    private Integer id;
+    private Long id;
     @Column(name = "description")
     private String description;
     @Column(name = "requester_id")

@@ -1,7 +1,8 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.Data;
+import lombok.*;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
@@ -10,8 +11,11 @@ import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 
-@Data
 @Entity
+@Getter
+@Setter
+@RequiredArgsConstructor
+@AllArgsConstructor
 @Table(name = "items", schema = "public")
 public class Item {
     @Id
@@ -28,9 +32,11 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
-    @OneToOne(mappedBy = "item")
-    private ItemRequest request;
+    @Column(name = "request_id")
+    private Long request;
     @OneToMany(mappedBy = "item")
     private List<Booking> bookings;
+    @OneToMany(mappedBy = "item")
+    private List<Comment> comments;
 }
 

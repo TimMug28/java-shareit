@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepositoryImpl;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
@@ -17,13 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 public class UserTests {
     UserService userService;
+    UserRepository userRepository;
     User user;
     User user2;
 
 
     @BeforeEach
     void start() {
-        userService = new UserServiceImpl(new UserRepositoryImpl());
+        userService = new UserServiceImpl( userRepository);
         user = new User();
         user2 = new User();
         user.setName("Bob");

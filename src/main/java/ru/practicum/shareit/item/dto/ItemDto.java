@@ -8,9 +8,7 @@ import ru.practicum.shareit.user.model.User;
 /**
  * TODO Sprint add-controllers.
  */
-@Getter
-@Setter
-@ToString
+@Data
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class ItemDto {
