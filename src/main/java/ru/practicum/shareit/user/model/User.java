@@ -6,10 +6,9 @@ import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.ItemRequest;
 
 import java.util.List;
 
