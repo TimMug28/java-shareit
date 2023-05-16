@@ -74,6 +74,4 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("Пользователь не найден.");
         }
     }
-
-
 }

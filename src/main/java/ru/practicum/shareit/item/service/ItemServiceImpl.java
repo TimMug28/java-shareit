@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidateUtil;
 import ru.practicum.shareit.exceptions.ValidationException;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserServiceImpl userService;
+    private final BookingService bookingService;
 
     public ItemDto createItem(ItemDto itemDto, Long owner) {
         Item item = ItemMapper.toItem(itemDto);

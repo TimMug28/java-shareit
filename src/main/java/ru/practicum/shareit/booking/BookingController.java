@@ -42,4 +42,18 @@ public class BookingController {
         log.info("GET /bookings/{} - получение данных о бронировании.", bookingId);
         return bookingService.findAllBookings(bookingId, userId);
     }
+
+    @GetMapping
+    public List<BookingDto> findBookingUsers(@RequestParam(value = "state", defaultValue = "ALL") String state,
+                                             @RequestHeader(value = "X-Sharer-User-Id") Long userId) {
+        log.info("GET /bookings - получение списка бронирований пользователя.");
+        return bookingService.findBookingUsers(state, userId);
+    }
+
+    @GetMapping("/owner")
+    public List<BookingDto> getOwnerBookings(@RequestParam(value = "state", defaultValue = "ALL") String state,
+                                             @RequestHeader(value = "X-Sharer-User-Id") Long userId) {
+        log.info("GET /bookings/owner - получение списка бронирований для всех вещей текущего пользователя.");
+        return bookingService.getOwnerBookings(userId, state);
+    }
 }
