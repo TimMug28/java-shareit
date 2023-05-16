@@ -18,5 +18,5 @@ public class ItemDto {
     private Boolean available;
     private User owner;
     @JsonIgnore
-    private ItemRequest request;
+    private Long request;
 }

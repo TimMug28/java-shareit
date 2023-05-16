@@ -75,7 +75,7 @@ public class ItemServiceImpl implements ItemService {
             itemOld.setAvailable(itemDto.getAvailable());
         }
         if (itemDto.getRequest() != null) {
-            itemOld.setRequest(itemDto.getRequest().getId());
+            itemOld.setRequest(itemDto.getRequest());
         }
         ItemDto updateItem = ItemMapper.toItemDto(itemRepository.save(itemOld));
         log.info("Отредактирована вещь c id={}.", id);

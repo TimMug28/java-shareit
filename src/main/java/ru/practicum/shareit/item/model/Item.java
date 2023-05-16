@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.item.comment.Comment;
@@ -30,6 +31,7 @@ public class Item {
     @Column(name = "is_available")
     private Boolean available;
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "owner_id")
     private User owner;
     @Column(name = "request_id")

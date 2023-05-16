@@ -4,6 +4,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.item.comment.Comment;
@@ -28,6 +29,7 @@ public class User {
     @Column(name = "email")
     private String email;
     @OneToMany(mappedBy = "owner")
+    @JsonIgnore
     private List<Item> items;
     @OneToMany(mappedBy = "booker")
     private List<Booking> bookings;
