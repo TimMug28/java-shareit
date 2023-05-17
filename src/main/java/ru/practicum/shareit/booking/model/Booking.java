@@ -6,8 +6,12 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.Past;
+
 
 /**
  * TODO Sprint add-bookings.
@@ -17,12 +21,16 @@ import java.time.LocalDateTime;
 @Table(name = "bookings", schema = "public")
 public class Booking {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
     @NotNull
+    @FutureOrPresent
+
     @Column(name = "start_date")
     private LocalDateTime start;
     @NotNull
+    @Future
     @Column(name = "end_date")
     private LocalDateTime end;
     @ManyToOne

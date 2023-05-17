@@ -20,7 +20,6 @@ import java.util.List;
 public class BookingController {
     private final BookingService bookingService;
 
-
     @PostMapping
     public BookingDto createBooking(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long owner,
                                     @RequestBody @Validated BookingDto bookingDto) {

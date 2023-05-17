@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserServiceImpl userService;
-    private final BookingService bookingService;
 
     public ItemDto createItem(ItemDto itemDto, Long owner) {
         Item item = ItemMapper.toItem(itemDto);

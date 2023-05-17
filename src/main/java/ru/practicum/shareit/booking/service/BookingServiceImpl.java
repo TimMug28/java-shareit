@@ -4,17 +4,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.StatusEnum;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.ValidationException;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -25,18 +28,25 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto createBooking(BookingDto bookingDto, Long owner) {
-        Booking booking = BookingMapper.toBooking(bookingDto);
         if (owner == null) {
             log.info("Пустое поле owner.");
             throw new ValidationException("Поле owner не может быть пустым.");
         }
-        UserDto user = userService.findUserById(owner);
-        ItemDto itemDto = itemService.findItemById(bookingDto.getItemId());
-        if (!itemDto.getAvailable()) {
-            throw new ValidationException("Вещь забронирована");
+        User user = UserMapper.toUser(userService.findUserById(owner));
+        Item item = ItemMapper.toItem(itemService.findItemById(bookingDto.getItemId()));
+        if (!item.getAvailable()) {
+            throw new ValidationException("Запрос на бронирование отклонен");
         }
-
-        return null;
+        if(bookingDto.getStart() == bookingDto.getEnd()){
+            log.info("Время начала и окончания бронирования не должны совпадать.");
+            throw new ValidationException("Время начала и окончания бронирования совпадают.");
+        }
+        bookingDto.setStatus(StatusEnum.WAITING);
+        Booking booking = BookingMapper.toBooking(bookingDto);
+        booking.setItem(item);
+        booking.setBooker(user);
+        Booking newBooking = bookingRepository.save(booking);
+        return BookingMapper.toDto(newBooking);
     }
 
     @Override
