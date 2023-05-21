@@ -39,7 +39,7 @@ public class BookingController {
     public List<BookingDto> getBookingDetails(@PathVariable("bookingId") Long bookingId,
                                               @RequestHeader(value = "X-Sharer-User-Id") Long userId) {
         log.info("GET /bookings/{} - получение данных о бронировании.", bookingId);
-        return bookingService.findAllBookings(bookingId, userId);
+        return bookingService.getBookingDetails(bookingId, userId);
     }
 
     @GetMapping

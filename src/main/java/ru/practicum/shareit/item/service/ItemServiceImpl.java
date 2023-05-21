@@ -39,6 +39,8 @@ public class ItemServiceImpl implements ItemService {
         item.setOwner(user);
         ItemDto createdItem = ItemMapper.toItemDto(itemRepository.save(item));
         log.info("Добавлена новая вещь: {}", createdItem);
+//        user.getItems().add( ItemMapper.toItem(createdItem));
+//        userService.updateUser(owner,UserMapper.toUserDto(user));
         return createdItem;
     }
 
