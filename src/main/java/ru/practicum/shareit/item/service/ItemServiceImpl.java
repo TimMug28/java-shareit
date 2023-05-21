@@ -13,12 +13,10 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -27,7 +25,9 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserServiceImpl userService;
+    private final UserRepository userRepository;
 
+    @Override
     public ItemDto createItem(ItemDto itemDto, Long owner) {
         Item item = ItemMapper.toItem(itemDto);
         if (owner == null) {
@@ -39,11 +39,11 @@ public class ItemServiceImpl implements ItemService {
         item.setOwner(user);
         ItemDto createdItem = ItemMapper.toItemDto(itemRepository.save(item));
         log.info("Добавлена новая вещь: {}", createdItem);
-//        user.getItems().add( ItemMapper.toItem(createdItem));
-//        userService.updateUser(owner,UserMapper.toUserDto(user));
+
         return createdItem;
     }
 
+    @Override
     public ItemDto findItemById(Long id) {
         ValidateUtil.validNumberNotNull(id, "id вещи не должно быть null.");
         Optional<Item> item = itemRepository.findById(id);
@@ -55,6 +55,7 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemDto(item.get());
     }
 
+    @Override
     public ItemDto updateItem(Long id, Long owner, ItemDto itemDto) {
         if (owner == null) {
             throw new ValidationException("Не указан владелец вещи.");
@@ -85,6 +86,7 @@ public class ItemServiceImpl implements ItemService {
         return updateItem;
     }
 
+    @Override
     public List<ItemDto> getAllItems(Long owner) {
         User user = UserMapper.toUser(userService.findUserById(owner));
         List<Item> itemList = itemRepository.findAllByOwnerOrderById(user);
@@ -95,6 +97,7 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public Set<ItemDto> searchForItemByDescription(String text, Long owner) {
         String description = text.toLowerCase();
         Set<Item> itemList = itemRepository.searchItemsByDescription(text);
@@ -104,6 +107,19 @@ public class ItemServiceImpl implements ItemService {
                 .map(ItemMapper::toItemDto)
                 .filter(ItemDto::getAvailable)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public List<ItemDto> findItemsByUserId(Long ownerId) {
+        User owner = userRepository.findById(ownerId).orElseThrow(() ->
+                new NotFoundException("Ошибка при получении списка вещей пользователя с ID = " + ownerId
+                        + "в БД. В БД отсутствует запись о пользователе."));
+        List<Item> items = itemRepository.findAllByOwnerOrderById(owner);
+        List <ItemDto> result = new ArrayList<>();
+        for (Item i : items){
+            result.add(ItemMapper.toItemDto(i));
+        }
+        return result;
     }
 
     private void validate(Item item) {

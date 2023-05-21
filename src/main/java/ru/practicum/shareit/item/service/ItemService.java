@@ -15,4 +15,5 @@ public interface ItemService {
     List<ItemDto> getAllItems(Long owner);
 
     Set<ItemDto> searchForItemByDescription(String text, Long owner);
+    public List <ItemDto> findItemsByUserId (Long ownerId);
 }

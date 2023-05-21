@@ -43,13 +43,9 @@ public class BookingServiceImpl implements BookingService {
         validateDate(bookingDto);
         bookingDto.setStatus(StatusEnum.WAITING);
         Booking booking = BookingMapper.toBooking(bookingDto, user, item);
-//        item.getBookings().add(booking);
-//        itemService.updateItem(item.getId(), ownerId, ItemMapper.toItemDto(item));
         booking.setBooker(user);
         booking.setItem(item);
         Booking newBooking = bookingRepository.save(booking);
-//        user.getBookings().add(newBooking);
-//        userService.updateUser(ownerId,UserMapper.toUserDto(user));
         return BookingMapper.toDto(newBooking);
     }
 
@@ -62,13 +58,11 @@ public class BookingServiceImpl implements BookingService {
             return null;
         }
         Booking oldBooking = bookingOptional.get();
-        if (!oldBooking.getBooker().getId().equals(ownerId)) {
+        if (!oldBooking.getItem().getOwner().getId().equals(ownerId)) {
             log.info("Изменять статус бронирования может только владелец вещи.");
             throw new ValidationException("Попытка редактирования статуса другим пользователем.");
         }
-        List<Item> itemList = user.getItems();
         Booking booking = bookingOptional.get();
-//        booking.setBooker(user);
         if (approved) {
             booking.setStatus(StatusEnum.APPROVED);
         } else {
@@ -79,8 +73,21 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getBookingDetails(Long bookingId, Long userId) {
-        return null;
+    public BookingDto getBookingDetails(Long bookingId, Long userId) {
+        Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
+        if (bookingOptional.isEmpty()) {
+            ValidateUtil.throwNotFound(String.format("Бронь с %d не найдена.", bookingId));
+            return null;
+        }
+        Booking booking = bookingOptional.get();
+        Long bookerId = booking.getBooker().getId();
+        Long ownerId = booking.getItem().getOwner().getId();
+        if ((ownerId.equals(userId)) || (bookerId.equals(userId))) {
+            return BookingMapper.toDto(booking);
+        } else {
+            log.info("Получать данные о бронировании может только создатель/владелец вещи.");
+            throw new ValidationException("Попытка получениие данных другим пользователем.");
+        }
     }
 
     @Override

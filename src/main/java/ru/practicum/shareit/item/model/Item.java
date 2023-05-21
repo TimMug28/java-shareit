@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import ru.practicum.shareit.booking.model.Booking;
@@ -36,6 +37,7 @@ public class Item {
     @Column(name = "request_id")
     private Long request;
     @OneToMany(mappedBy = "item")
+    @JsonBackReference
     private List<Booking> bookings;
     @OneToMany(mappedBy = "item")
     private List<Comment> comments;
