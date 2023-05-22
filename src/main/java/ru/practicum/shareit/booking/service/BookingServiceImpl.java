@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingMapper;
-import ru.practicum.shareit.booking.StateEnum;
-import ru.practicum.shareit.booking.StatusEnum;
+import ru.practicum.shareit.booking.Enum.StateEnum;
+import ru.practicum.shareit.booking.Enum.StatusEnum;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -18,6 +18,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -114,57 +115,54 @@ public class BookingServiceImpl implements BookingService {
             log.info("Не найден пользователь c id={}.", userId);
             throw new NotFoundException("Пользователь не найден.");
         }
+        User user = booker.get();
         List<Booking> bookingList = bookingRepository.findByBooker_Id(userId);
-        StateEnum status = StateEnum.valueOf(state);
         LocalDateTime currentDate = LocalDateTime.now();
-        List<Booking> result;
-
+        List<Booking> result = new ArrayList<>();
+        StateEnum status;
+        try {
+            status = StateEnum.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            status = StateEnum.UNKNOWN;
+        }
         switch (status) {
-            case CURRENT:
-                result = bookingList.stream()
-                        .filter(booking -> booking.getStart().isBefore(currentDate)
-                                && booking.getEnd().isAfter(currentDate)
-                                && booking.getStatus().equals(StatusEnum.APPROVED))
-                        .sorted(Comparator.comparing(Booking::getStart).reversed())
-                        .collect(Collectors.toList());
-                break;
-            case PAST:
-                result = bookingList.stream()
-                        .filter(booking -> booking.getEnd().isBefore(currentDate))
-                        .sorted(Comparator.comparing(Booking::getStart).reversed())
-                        .collect(Collectors.toList());
+            case ALL:
+                result = bookingRepository.findAllBookingsByBooker(user);
                 break;
             case FUTURE:
-                result = bookingList.stream()
-                        .filter(booking -> booking.getStart().isAfter(currentDate))
-                        .sorted(Comparator.comparing(Booking::getStart))
-                        .collect(Collectors.toList());
+                result = bookingRepository.findAllByBookerAndStartAfterOrderByStart(user, currentDate);
                 break;
+            case CURRENT:
+                result = bookingRepository.findAllByItem_OwnerAndStartBeforeAndEndAfterOrderByStartDesc(user, currentDate, currentDate);
+                break;
+            case PAST:
+                result = bookingRepository.findAllByItem_OwnerAndEndIsBeforeOrderByStartDesc(user, currentDate);
+                break;
+
             case WAITING:
-                result = bookingList.stream()
-                        .filter(booking -> booking.getStatus().equals(StatusEnum.WAITING)
-                                && booking.getStart().isBefore(currentDate)
-                                && booking.getEnd().isAfter(currentDate))
-                        .sorted(Comparator.comparing(Booking::getStart))
-                        .collect(Collectors.toList());
+                result = bookingRepository.findAllByItem_OwnerAndStatusEqualsOrderByStartDesc(user, StatusEnum.WAITING);
                 break;
             case REJECTED:
-                result = bookingList.stream()
-                        .filter(booking -> booking.getStatus().equals(StatusEnum.REJECTED) || booking.getStatus().equals(StatusEnum.CANCELED))
-                        .sorted(Comparator.comparing(Booking::getStart))
-                        .collect(Collectors.toList());
+                result = bookingRepository.findAllByItem_OwnerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED);
                 break;
-            default:
+            case UNKNOWN:
                 throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+            default:
+                break;
         }
+
         return result.stream()
-                .sorted(Comparator.comparing(Booking::getStart).reversed())
                 .map(BookingMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<BookingDto> getOwnerBookings(Long userId, String state) {
+        Optional<User> booker = userRepository.findById(userId);
+        if (booker.isEmpty()) {
+            log.info("Не найден пользователь c id={}.", userId);
+            throw new NotFoundException("Пользователь не найден.");
+        }
         return null;
     }
 

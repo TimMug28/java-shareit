@@ -2,18 +2,14 @@ package ru.practicum.shareit.booking.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
-import ru.practicum.shareit.booking.StatusEnum;
+import ru.practicum.shareit.booking.Enum.StatusEnum;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.Past;
 
 
 /**

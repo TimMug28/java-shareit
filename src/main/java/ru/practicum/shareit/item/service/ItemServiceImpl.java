@@ -112,8 +112,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> findItemsByUserId(Long ownerId) {
         User owner = userRepository.findById(ownerId).orElseThrow(() ->
-                new NotFoundException("Ошибка при получении списка вещей пользователя с ID = " + ownerId
-                        + "в БД. В БД отсутствует запись о пользователе."));
+                new NotFoundException("Ошибка при получении списка вещей пользователя с ID = " + ownerId));
         List<Item> items = itemRepository.findAllByOwnerOrderById(owner);
         List <ItemDto> result = new ArrayList<>();
         for (Item i : items){

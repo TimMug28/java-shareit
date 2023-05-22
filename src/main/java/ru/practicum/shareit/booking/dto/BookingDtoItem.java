@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import ru.practicum.shareit.booking.StatusEnum;
+import ru.practicum.shareit.booking.Enum.StatusEnum;
 
 import java.time.LocalDateTime;
 
