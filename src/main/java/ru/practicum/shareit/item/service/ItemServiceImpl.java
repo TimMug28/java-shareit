@@ -9,6 +9,7 @@ import ru.practicum.shareit.exceptions.ValidateUtil;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoForBooking;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.UserMapper;
@@ -87,15 +88,16 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getAllItems(Long owner) {
+    public List<ItemDtoForBooking> getAllItems(Long owner) {
         User user = UserMapper.toUser(userService.findUserById(owner));
         List<Item> itemList = itemRepository.findAllByOwnerOrderById(user);
         log.info("Получен список всех вещей пользователя с id = " + user.getId());
-        return itemList
-                .stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+
+        List<ItemDtoForBooking> itemDtoList = new ArrayList<>();
+
+              return itemDtoList;
     }
+
 
     @Override
     public Set<ItemDto> searchForItemByDescription(String text, Long owner) {
