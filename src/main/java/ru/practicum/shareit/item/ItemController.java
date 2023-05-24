@@ -50,7 +50,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public Set<ItemDto> searchForItemByDescription(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long owner,
+    public List<ItemDto> searchForItemByDescription(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long owner,
                                                    @RequestParam(defaultValue = "null") String text
     ) {
         log.info("GET /items/search?text= " + text);

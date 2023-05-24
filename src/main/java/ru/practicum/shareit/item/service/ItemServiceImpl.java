@@ -140,16 +140,18 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Set<ItemDto> searchForItemByDescription(String text, Long owner) {
+    public List<ItemDto> searchForItemByDescription(String text, Long owner) {
         String description = text.toLowerCase();
-        Set<Item> itemList = itemRepository.searchItemsByDescription(text);
+        List<Item> itemList = itemRepository.searchItemsByDescription(text);
         log.info("Запрошены вещи по ключевому слову={}.", description);
         return itemList
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .filter(ItemDto::getAvailable)
-                .collect(Collectors.toSet());
+                .sorted(Comparator.comparing(ItemDto::getId))
+                .collect(Collectors.toList());
     }
+
 
     @Override
     public List<ItemDto> findItemsByUserId(Long ownerId) {
