@@ -3,11 +3,14 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.booking.BookingItemMapper;
+import ru.practicum.shareit.booking.Enum.StatusEnum;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidateUtil;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.ItemMapperBooking;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoForBooking;
 import ru.practicum.shareit.item.model.Item;
@@ -17,6 +20,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,9 +31,12 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserServiceImpl userService;
     private final UserRepository userRepository;
+    private final BookingItemMapper bookingItemMapper;
+    private final ItemMapperBooking itemMapperBooking;
 
     @Override
     public ItemDto createItem(ItemDto itemDto, Long owner) {
+
         Item item = ItemMapper.toItem(itemDto);
         if (owner == null) {
             log.info("Пустое поле owner.");
@@ -45,15 +52,34 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto findItemById(Long id) {
+    public ItemDtoForBooking findItemById(Long id, Long ownerId) {
         ValidateUtil.validNumberNotNull(id, "id вещи не должно быть null.");
-        Optional<Item> item = itemRepository.findById(id);
-        if (item.isEmpty()) {
+        Optional<Item> itemOptional = itemRepository.findById(id);
+        if (itemOptional.isEmpty()) {
             ValidateUtil.throwNotFound(String.format("Вещь с %d не найдена.", id));
             return null;
         }
-        log.info("Запрошена вещь c id={}.", id);
-        return ItemMapper.toItemDto(item.get());
+        Optional<User> owner = userRepository.findById(ownerId);
+        if (owner.isEmpty()) {
+            log.info("Не найден пользователь c id={}.", ownerId);
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        Item item = itemOptional.get();
+        List<Booking> bookings = item.getBookings();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        Booking lastBooking = null;
+        Booking nextBooking = null;
+        ItemDtoForBooking itemDtoForBooking = itemMapperBooking.toDto(item);
+        if (Objects.equals(item.getOwner().getId(), ownerId) && bookings != null) {
+            nextBooking = findNext(bookings, localDateTime);
+            lastBooking = findLast(bookings, localDateTime);
+        }
+        itemDtoForBooking.setLastBooking(lastBooking != null
+                ? bookingItemMapper.toDto(lastBooking) : null);
+        itemDtoForBooking.setNextBooking(nextBooking != null
+                ? bookingItemMapper.toDto(nextBooking) : null);
+
+        return itemDtoForBooking;
     }
 
     @Override
@@ -87,17 +113,31 @@ public class ItemServiceImpl implements ItemService {
         return updateItem;
     }
 
+
     @Override
-    public List<ItemDtoForBooking> getAllItems(Long owner) {
-        User user = UserMapper.toUser(userService.findUserById(owner));
-        List<Item> itemList = itemRepository.findAllByOwnerOrderById(user);
-        log.info("Получен список всех вещей пользователя с id = " + user.getId());
+    public List<ItemDtoForBooking> getAllItems(Long ownerId) {
+        Optional<User> userOptional = userRepository.findById(ownerId);
+        if (userOptional.isEmpty()) {
+            log.info("Не найден пользователь c id={}.", ownerId);
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        List<Item> items = itemRepository.findAllByOwnerOrderById(userOptional.get());
+        List<ItemDtoForBooking> itemDtoForBookingSet = new ArrayList<>();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        for (Item item : items) {
+            ItemDtoForBooking itemDtoForBooking = itemMapperBooking.toDto(item);
+            List<Booking> bookings = item.getBookings();
 
-        List<ItemDtoForBooking> itemDtoList = new ArrayList<>();
-
-              return itemDtoList;
+            Booking lastBooking = findLast(bookings, localDateTime);
+            Booking nextBooking = findNext(bookings, localDateTime);
+            itemDtoForBooking.setLastBooking(lastBooking != null
+                    ? bookingItemMapper.toDto(lastBooking) : null);
+            itemDtoForBooking.setNextBooking(nextBooking != null
+                    ? bookingItemMapper.toDto(nextBooking) : null);
+            itemDtoForBookingSet.add(itemDtoForBooking);
+        }
+        return itemDtoForBookingSet;
     }
-
 
     @Override
     public Set<ItemDto> searchForItemByDescription(String text, Long owner) {
@@ -116,9 +156,9 @@ public class ItemServiceImpl implements ItemService {
         User owner = userRepository.findById(ownerId).orElseThrow(() ->
                 new NotFoundException("Ошибка при получении списка вещей пользователя с ID = " + ownerId));
         List<Item> items = itemRepository.findAllByOwnerOrderById(owner);
-        List <ItemDto> result = new ArrayList<>();
-        for (Item i : items){
-            result.add(ItemMapper.toItemDto(i));
+        List<ItemDto> result = new ArrayList<>();
+        for (Item item : items) {
+            result.add(ItemMapper.toItemDto(item));
         }
         return result;
     }
@@ -137,4 +177,21 @@ public class ItemServiceImpl implements ItemService {
             throw new ValidationException("Поле available не может быть пустым.");
         }
     }
+
+    private Booking findNext(List<Booking> bookings, LocalDateTime localDateTime) {
+        return bookings.stream()
+                .filter(b -> b.getStart().isAfter(localDateTime))
+                .filter(b -> b.getStatus() == StatusEnum.APPROVED || b.getStatus() == StatusEnum.WAITING)
+                .min(Comparator.comparing(Booking::getStart))
+                .orElse(null);
+    }
+
+    private Booking findLast(List<Booking> bookings, LocalDateTime localDateTime) {
+        return bookings.stream()
+                .filter(b -> b.getEnd().isBefore(localDateTime))
+                .filter(b -> b.getStatus() == StatusEnum.APPROVED)
+                .max(Comparator.comparing(Booking::getEnd))
+                .orElse(null);
+    }
+
 }

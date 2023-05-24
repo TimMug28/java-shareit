@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoForBooking;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.List;
@@ -28,13 +29,15 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto findItemById(@PathVariable Long itemId) {
+    public ItemDtoForBooking findItemById(@RequestHeader(value = "X-Sharer-User-Id") Long owner,
+                                          @PathVariable Long itemId) {
         log.info("GET /items - запрос вещи по id.");
-        return itemService.findItemById(itemId);
+        return itemService.findItemById(itemId, owner);
     }
 
     @GetMapping()
-    public List<ItemDto> getAllItems(@RequestHeader("X-Sharer-User-Id") Long owner) {
+    public List<ItemDtoForBooking> getAllItems(@RequestHeader("X-Sharer-User-Id") Long owner) {
+        log.info("GET /items - запрос вещей пользователя " + owner);
         return itemService.getAllItems(owner);
     }
 
