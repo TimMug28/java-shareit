@@ -205,7 +205,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         comment.setItem(item);
-        comment.setAuthor(user);
+        comment.setAuthorName(user);
         commentD = CommentMapper.toDTO(commentRepository.save(comment));
         return commentD;
     }

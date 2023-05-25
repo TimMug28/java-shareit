@@ -28,7 +28,7 @@ public class Comment {
     private Item item;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "author_id")
-    private User author;
+    private User authorName;
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
 }

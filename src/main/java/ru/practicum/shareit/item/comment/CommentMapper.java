@@ -9,7 +9,7 @@ public class CommentMapper {
         commentDTO.setId(comment.getId());
         commentDTO.setText(comment.getText());
         commentDTO.setItem(comment.getItem());
-        commentDTO.setAuthor(comment.getAuthor());
+        commentDTO.setAuthorName(comment.getAuthorName().getName());
         commentDTO.setCreatedDate(comment.getCreatedDate());
         return commentDTO;
     }
@@ -19,7 +19,7 @@ public class CommentMapper {
         comment.setId(commentDTO.getId());
         comment.setText(commentDTO.getText());
         comment.setItem(item);
-        comment.setAuthor(author);
+        comment.setAuthorName(author);
         comment.setCreatedDate(commentDTO.getCreatedDate());
         return comment;
     }
