@@ -11,6 +11,10 @@ import ru.practicum.shareit.exceptions.ValidateUtil;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemMapperBooking;
+import ru.practicum.shareit.item.comment.Comment;
+import ru.practicum.shareit.item.comment.CommentDto;
+import ru.practicum.shareit.item.comment.CommentMapper;
+import ru.practicum.shareit.item.comment.repository.CommentRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoForBooking;
 import ru.practicum.shareit.item.model.Item;
@@ -33,6 +37,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingItemMapper bookingItemMapper;
     private final ItemMapperBooking itemMapperBooking;
+    private final CommentRepository commentRepository;
 
     @Override
     public ItemDto createItem(ItemDto itemDto, Long owner) {
@@ -163,6 +168,46 @@ public class ItemServiceImpl implements ItemService {
             result.add(ItemMapper.toItemDto(item));
         }
         return result;
+    }
+
+    @Override
+    public CommentDto createComment(CommentDto commentDto, Long itemId, Long userId) {
+        if (commentDto.getText().isBlank()) {
+            throw new ValidationException("Пустой комментарий.");
+        }
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            log.info("Не найден пользователь c id={}.", userId);
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        User user = userOptional.get();
+        Optional<Item> itemOptional = itemRepository.findById(itemId);
+        if (itemOptional.isEmpty()) {
+            log.info("Не найдена вещь c id={}.", itemId);
+            ValidateUtil.throwNotFound(String.format("Вещь с %d не найдена.", itemId));
+        }
+        Item item = itemOptional.get();
+        if (item.getOwner().equals(user)) {
+            throw new ValidationException("Владелец вещи не может оставлять комментарии.");
+        }
+        LocalDateTime localDateTime = LocalDateTime.now();
+        commentDto.setCreatedDate(localDateTime);
+        List<Booking> bookings = item.getBookings();
+        Comment comment = CommentMapper.toComment(commentDto, item, user);
+        CommentDto commentD;
+
+        boolean isBooker = bookings.stream()
+                .filter(b -> b.getBooker().getId().equals(userId))
+                .anyMatch(b -> b.getEnd().isBefore(LocalDateTime.now()));
+
+        if (!isBooker) {
+            throw new ValidationException("Ошибка при сохранении комментария.");
+        }
+
+        comment.setItem(item);
+        comment.setAuthor(user);
+        commentD = CommentMapper.toDTO(commentRepository.save(comment));
+        return commentD;
     }
 
     private void validate(Item item) {

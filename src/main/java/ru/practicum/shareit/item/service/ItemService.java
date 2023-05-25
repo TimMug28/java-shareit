@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoForBooking;
 
@@ -16,5 +17,8 @@ public interface ItemService {
     List<ItemDtoForBooking> getAllItems(Long owner);
 
     List<ItemDto> searchForItemByDescription(String text, Long owner);
-    public List <ItemDto> findItemsByUserId (Long ownerId);
+
+    public List<ItemDto> findItemsByUserId(Long ownerId);
+
+    CommentDto createComment(CommentDto commentDto, Long itemId, Long userId);
 }

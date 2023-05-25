@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.comment.Comment;
@@ -39,6 +40,7 @@ public class Item {
     @OneToMany(mappedBy = "item")
     @JsonBackReference
     private List<Booking> bookings;
+    @JsonManagedReference
     @OneToMany(mappedBy = "item")
     private List<Comment> comments;
 }

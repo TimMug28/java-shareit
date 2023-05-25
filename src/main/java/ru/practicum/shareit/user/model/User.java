@@ -37,6 +37,7 @@ public class User {
     @OneToMany(mappedBy = "booker")
     @JsonIgnoreProperties("booker")
     private List<Booking> bookings;
+    @JsonIgnore
     @OneToMany(mappedBy = "author")
     private List<Comment> comments;
 

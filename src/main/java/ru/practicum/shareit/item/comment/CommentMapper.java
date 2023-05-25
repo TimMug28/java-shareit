@@ -14,15 +14,11 @@ public class CommentMapper {
         return commentDTO;
     }
 
-    public static Comment toComment(CommentDto commentDTO) {
+    public static Comment toComment(CommentDto commentDTO, Item item, User author) {
         Comment comment = new Comment();
         comment.setId(commentDTO.getId());
         comment.setText(commentDTO.getText());
-        Item item = new Item();
-        item.setId(commentDTO.getItem().getId());
         comment.setItem(item);
-        User author = new User();
-        author.setId(commentDTO.getAuthor().getId());
         comment.setAuthor(author);
         comment.setCreatedDate(commentDTO.getCreatedDate());
         return comment;
