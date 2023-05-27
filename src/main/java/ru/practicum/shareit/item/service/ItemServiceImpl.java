@@ -83,7 +83,10 @@ public class ItemServiceImpl implements ItemService {
                 ? bookingItemMapper.toDto(lastBooking) : null);
         itemDtoForBooking.setNextBooking(nextBooking != null
                 ? bookingItemMapper.toDto(nextBooking) : null);
-
+        List<Comment> comments = item.getComments();
+        List<CommentDto> commentDto = comments.stream()
+                .map(CommentMapper::toDTO).collect(Collectors.toList());
+        itemDtoForBooking.setComments(commentDto);
         return itemDtoForBooking;
     }
 
@@ -118,7 +121,6 @@ public class ItemServiceImpl implements ItemService {
         return updateItem;
     }
 
-
     @Override
     public List<ItemDtoForBooking> getAllItems(Long ownerId) {
         Optional<User> userOptional = userRepository.findById(ownerId);
@@ -139,6 +141,11 @@ public class ItemServiceImpl implements ItemService {
                     ? bookingItemMapper.toDto(lastBooking) : null);
             itemDtoForBooking.setNextBooking(nextBooking != null
                     ? bookingItemMapper.toDto(nextBooking) : null);
+
+            List<Comment> comments = item.getComments();
+            List<CommentDto> commentDto = comments.stream()
+                    .map(CommentMapper::toDTO).collect(Collectors.toList());
+            itemDtoForBooking.setComments(commentDto);
             itemDtoForBookingSet.add(itemDtoForBooking);
         }
         return itemDtoForBookingSet;
@@ -156,7 +163,6 @@ public class ItemServiceImpl implements ItemService {
                 .sorted(Comparator.comparing(ItemDto::getId))
                 .collect(Collectors.toList());
     }
-
 
     @Override
     public List<ItemDto> findItemsByUserId(Long ownerId) {
@@ -193,17 +199,16 @@ public class ItemServiceImpl implements ItemService {
         LocalDateTime localDateTime = LocalDateTime.now();
         commentDto.setCreatedDate(localDateTime);
         List<Booking> bookings = item.getBookings();
-        Comment comment = CommentMapper.toComment(commentDto, item, user);
+        Comment comment = CommentMapper.toComment(commentDto, user);
         CommentDto commentD;
 
-        boolean isBooker = bookings.stream()
+        boolean condition = bookings.stream()
                 .filter(b -> b.getBooker().getId().equals(userId))
                 .anyMatch(b -> b.getEnd().isBefore(LocalDateTime.now()));
 
-        if (!isBooker) {
+        if (!condition) {
             throw new ValidationException("Ошибка при сохранении комментария.");
         }
-
         comment.setItem(item);
         comment.setAuthorName(user);
         commentD = CommentMapper.toDTO(commentRepository.save(comment));
@@ -235,10 +240,9 @@ public class ItemServiceImpl implements ItemService {
 
     private Booking findLast(List<Booking> bookings, LocalDateTime localDateTime) {
         return bookings.stream()
-                .filter(b -> b.getEnd().isBefore(localDateTime))
+                .filter(b -> b.getStart().isBefore(localDateTime))
                 .filter(b -> b.getStatus() == StatusEnum.APPROVED)
                 .max(Comparator.comparing(Booking::getEnd))
                 .orElse(null);
     }
-
 }

@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.comment;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false, unique = true)
     private Long id;
-
     @Column(name = "text", nullable = false, length = 512)
     private String text;
     @JsonBackReference

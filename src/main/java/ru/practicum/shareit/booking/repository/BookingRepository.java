@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.repository;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.Enum.StatusEnum;
@@ -61,6 +60,4 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "order by b.start DESC")
     List<Booking> findAllByItem_OwnerAndStartBeforeAndEndAfterOrderByStartDesc(
             User user, LocalDateTime localDateTime, LocalDateTime localDateTime2);
-
-
 }
