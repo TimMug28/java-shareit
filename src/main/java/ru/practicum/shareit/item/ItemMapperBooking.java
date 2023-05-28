@@ -1,8 +1,5 @@
 package ru.practicum.shareit.item;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
-import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.item.comment.CommentMapper;
 import ru.practicum.shareit.item.dto.ItemDtoForBooking;
 import ru.practicum.shareit.item.model.Item;
