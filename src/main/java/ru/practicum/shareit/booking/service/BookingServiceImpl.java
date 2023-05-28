@@ -85,7 +85,7 @@ public class BookingServiceImpl implements BookingService {
             log.info("Изменять статус бронирования может только владелец вещи.");
             throw new NotFoundException("Попытка редактирования статуса другим пользователем.");
         }
-        if(Objects.equals(StatusEnum.APPROVED, oldBooking.getStatus()) && approved){
+        if (Objects.equals(StatusEnum.APPROVED, oldBooking.getStatus()) && approved) {
             log.info("Статус бронирования уже изменён.");
             throw new ValidationException("Попытка изменения статуса бронирования.");
         }
