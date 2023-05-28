@@ -58,6 +58,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDtoForBooking findItemById(Long id, Long ownerId) {
+
         ValidateUtil.validNumberNotNull(id, "id вещи не должно быть null.");
         Optional<Item> itemOptional = itemRepository.findById(id);
         if (itemOptional.isEmpty()) {
@@ -74,7 +75,7 @@ public class ItemServiceImpl implements ItemService {
         LocalDateTime localDateTime = LocalDateTime.now();
         Booking lastBooking = null;
         Booking nextBooking = null;
-        ItemDtoForBooking itemDtoForBooking = itemMapperBooking.toDto(item);
+        ItemDtoForBooking itemDtoForBooking = ItemMapperBooking.toDto(item);
         if (Objects.equals(item.getOwner().getId(), ownerId) && bookings != null) {
             nextBooking = findNext(bookings, localDateTime);
             lastBooking = findLast(bookings, localDateTime);
@@ -132,7 +133,7 @@ public class ItemServiceImpl implements ItemService {
         List<ItemDtoForBooking> itemDtoForBookingSet = new ArrayList<>();
         LocalDateTime localDateTime = LocalDateTime.now();
         for (Item item : items) {
-            ItemDtoForBooking itemDtoForBooking = itemMapperBooking.toDto(item);
+            ItemDtoForBooking itemDtoForBooking = ItemMapperBooking.toDto(item);
             List<Booking> bookings = item.getBookings();
 
             Booking lastBooking = findLast(bookings, localDateTime);
