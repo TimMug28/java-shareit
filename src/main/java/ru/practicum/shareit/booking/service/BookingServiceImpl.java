@@ -102,7 +102,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto getBookingDetails(Long bookingId, Long userId) {
         Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
-        Optional <User> userOptional = userRepository.findById(userId);
+        Optional<User> userOptional = userRepository.findById(userId);
         if (bookingOptional.isEmpty()) {
             log.info("Не найдена бронь с id:" + bookingId);
             throw new NotFoundException("Бронь не найдена.");
