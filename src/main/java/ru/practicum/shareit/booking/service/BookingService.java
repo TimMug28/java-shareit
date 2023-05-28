@@ -9,7 +9,8 @@ public interface BookingService {
 
     BookingDto getBookingDetails(Long bookingId, Long userId);
 
-    BookingDto updateBookingStatus(Long id , boolean approved, Long ownerId);
+    BookingDto updateBookingStatus(Long id, boolean approved, Long ownerId);
+
     List<BookingDto> findBookingUsers(String state, Long userid);
 
     List<BookingDto> getOwnerBookings(Long userId, String state);

@@ -2,7 +2,6 @@ package ru.practicum.shareit.request;
 
 import lombok.Data;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

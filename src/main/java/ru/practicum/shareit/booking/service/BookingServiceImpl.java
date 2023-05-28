@@ -18,7 +18,10 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -204,9 +207,7 @@ public class BookingServiceImpl implements BookingService {
             default:
                 break;
         }
-        return result.stream()
-                .map(BookingMapper::toDto)
-                .collect(Collectors.toList());
+        return result.stream().map(BookingMapper::toDto).collect(Collectors.toList());
     }
 
     private void validateDate(BookingDto bookingDto) {
