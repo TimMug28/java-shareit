@@ -6,9 +6,7 @@ import ru.practicum.shareit.item.model.Item;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-item-requests.
- */
+
 @Data
 @Entity
 @Table(name = "requests")

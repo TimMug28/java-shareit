@@ -21,5 +21,4 @@ public class BookingDtoItem {
     private LocalDateTime end;
     private Long bookerId;
     private StatusEnum status;
-
 }

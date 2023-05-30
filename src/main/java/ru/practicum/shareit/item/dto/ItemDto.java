@@ -4,11 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import ru.practicum.shareit.user.model.User;
 
-/**
- * TODO Sprint add-controllers.
- */
+
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
@@ -17,7 +14,13 @@ public class ItemDto {
     private String name;
     private String description;
     private Boolean available;
-    private User owner;
+    private Owner owner;
     @JsonIgnore
     private Long request;
+
+    @Data
+    public static class Owner {
+        private final long id;
+        private final String name;
+    }
 }

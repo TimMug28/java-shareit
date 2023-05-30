@@ -4,14 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.booking.Enum.StateEnum;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exceptions.ValidationException;
 
 import java.util.List;
-
-/**
- * TODO Sprint add-bookings.
- */
 
 @Slf4j
 @RequiredArgsConstructor
@@ -46,13 +44,23 @@ public class BookingController {
     public List<BookingDto> findBookingUsers(@RequestParam(value = "state", defaultValue = "ALL") String state,
                                              @RequestHeader(value = "X-Sharer-User-Id") Long userId) {
         log.info("GET /bookings - получение списка бронирований пользователя.");
-        return bookingService.findBookingUsers(state, userId);
+        try {
+            StateEnum status = StateEnum.valueOf(state);
+            return bookingService.findBookingUsers(status, userId);
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+        }
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getOwnerBookings(@RequestParam(value = "state", defaultValue = "ALL") String state,
                                              @RequestHeader(value = "X-Sharer-User-Id") Long userId) {
         log.info("GET /bookings/owner - получение списка бронирований для всех вещей текущего пользователя.");
-        return bookingService.getOwnerBookings(userId, state);
+        try {
+            StateEnum status = StateEnum.valueOf(state);
+            return bookingService.getOwnerBookings(userId, status);
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+        }
     }
 }

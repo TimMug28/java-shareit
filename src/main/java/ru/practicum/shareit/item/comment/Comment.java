@@ -2,8 +2,7 @@ package ru.practicum.shareit.item.comment;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -11,7 +10,9 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
 @RequiredArgsConstructor
 @Table(name = "comments", schema = "public")
 public class Comment {

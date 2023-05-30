@@ -52,7 +52,6 @@ public class BookingServiceImpl implements BookingService {
         }
         Item item = itemOptional.get();
         if (item.getOwner().equals(booker)) {
-            String message = "Создать бронь на свою вещь нельзя.";
             log.info("Нельзя бронировать свои вещи.");
             throw new NotFoundException("Попытка бронирования своих вещей.");
         }
@@ -62,8 +61,6 @@ public class BookingServiceImpl implements BookingService {
         validateDate(bookingDto);
         bookingDto.setStatus(StatusEnum.WAITING);
         Booking booking = BookingMapper.toBooking(bookingDto, booker, item);
-        booking.setBooker(booker);
-        booking.setItem(item);
         Booking newBooking = bookingRepository.save(booking);
         return BookingMapper.toDto(newBooking);
     }
@@ -123,7 +120,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> findBookingUsers(String state, Long userId) {
+    public List<BookingDto> findBookingUsers(StateEnum state, Long userId) {
         Optional<User> booker = userRepository.findById(userId);
         if (booker.isEmpty()) {
             log.info("Не найден пользователь c id={}.", userId);
@@ -132,13 +129,7 @@ public class BookingServiceImpl implements BookingService {
         User user = booker.get();
         LocalDateTime currentDate = LocalDateTime.now();
         List<Booking> result = new ArrayList<>();
-        StateEnum status;
-        try {
-            status = StateEnum.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            status = StateEnum.UNKNOWN;
-        }
-        switch (status) {
+        switch (state) {
             case ALL:
                 result = bookingRepository.findAllBookingsByBooker(user);
                 break;
@@ -157,8 +148,6 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED:
                 result = bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED);
                 break;
-            case UNKNOWN:
-                throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
             default:
                 break;
         }
@@ -168,7 +157,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getOwnerBookings(Long userId, String state) {
+    public List<BookingDto> getOwnerBookings(Long userId, StateEnum state) {
         Optional<User> owner = userRepository.findById(userId);
         if (owner.isEmpty()) {
             log.info("Не найден пользователь c id={}.", userId);
@@ -177,13 +166,7 @@ public class BookingServiceImpl implements BookingService {
         User user = owner.get();
         LocalDateTime currentDate = LocalDateTime.now();
         List<Booking> result = new ArrayList<>();
-        StateEnum status;
-        try {
-            status = StateEnum.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            status = StateEnum.UNKNOWN;
-        }
-        switch (status) {
+        switch (state) {
             case ALL:
                 result = bookingRepository.findAllBookingsByItem_Owner(user);
                 break;
@@ -202,8 +185,6 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED:
                 result = bookingRepository.findAllByItem_OwnerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED);
                 break;
-            case UNKNOWN:
-                throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
             default:
                 break;
         }
@@ -211,7 +192,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void validateDate(BookingDto bookingDto) {
-
         if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {
             log.info("Время начала и окончания бронирования не должны быть пустыми.");
             throw new ValidationException("Время начала и окончания бронирования не должны быть пустыми.");
