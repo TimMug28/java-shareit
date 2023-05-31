@@ -4,15 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoForBooking;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.List;
-import java.util.Set;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -28,13 +26,15 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto findItemById(@PathVariable Long itemId) {
+    public ItemDtoForBooking findItemById(@RequestHeader(value = "X-Sharer-User-Id") Long owner,
+                                          @PathVariable Long itemId) {
         log.info("GET /items - запрос вещи по id.");
-        return itemService.findItemById(itemId);
+        return itemService.findItemById(itemId, owner);
     }
 
     @GetMapping()
-    public List<ItemDto> getAllItems(@RequestHeader("X-Sharer-User-Id") Long owner) {
+    public List<ItemDtoForBooking> getAllItems(@RequestHeader("X-Sharer-User-Id") Long owner) {
+        log.info("GET /items - запрос вещей пользователя " + owner);
         return itemService.getAllItems(owner);
     }
 
@@ -47,10 +47,19 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public Set<ItemDto> searchForItemByDescription(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long owner,
-                                                   @RequestParam(defaultValue = "null") String text
+    public List<ItemDto> searchForItemByDescription(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long owner,
+                                                    @RequestParam(defaultValue = "null") String text
     ) {
         log.info("GET /items/search?text= " + text);
         return itemService.searchForItemByDescription(text, owner);
     }
+
+    @PostMapping("{itemId}/comment")
+    public CommentDto createComment(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId,
+                                    @PathVariable Long itemId,
+                                    @RequestBody @Validated CommentDto commentDto) {
+        log.info("POST /comment - добавление комментария.");
+        return itemService.createComment(commentDto, itemId, userId);
+    }
+
 }

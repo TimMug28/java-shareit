@@ -25,9 +25,10 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
+    //409
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleForConflict(final ConflictException e) {
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleForUnsupportedStatus(final ConflictException e) {
         return new ErrorResponse(e.getMessage());
     }
 

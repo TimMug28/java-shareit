@@ -1,20 +1,26 @@
 package ru.practicum.shareit.item.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.user.model.User;
+import lombok.RequiredArgsConstructor;
 
-/**
- * TODO Sprint add-controllers.
- */
+
 @Data
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class ItemDto {
     private Long id;
     private String name;
     private String description;
     private Boolean available;
-    private User owner;
+    private Owner owner;
     @JsonIgnore
-    private ItemRequest request;
+    private Long request;
+
+    @Data
+    public static class Owner {
+        private final long id;
+        private final String name;
+    }
 }
