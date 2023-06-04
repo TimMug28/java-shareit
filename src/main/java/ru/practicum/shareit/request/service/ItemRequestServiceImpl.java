@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
+import ru.practicum.shareit.item.comment.CommentDto;
+import ru.practicum.shareit.item.comment.CommentMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.ItemRequestMapper;
@@ -17,6 +19,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -39,7 +42,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             log.info("Не найден пользователь с id:" + id);
             throw new NotFoundException("Пользователь не найден.");
         }
-        List <Item> itemOptional = itemRepository.findAllByOwnerOrderById(userOptional.get());
         validate(itemRequestDto);
         ItemRequest itemRequest = ItemRequestMapper.toItemRequest(itemRequestDto, time);
         itemRequest.setRequestor(userOptional.get());
@@ -59,9 +61,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             log.info("Не найден пользователь с id:" + id);
             throw new NotFoundException("Пользователь не найден.");
         }
-        List <Item> itemOptional = itemRepository.findAllByOwnerOrderById(userOptional.get());
-//        Optional <ItemRequest> itemRequestOptional = itemRequestRepository.
-        return null;
+        User requestor = userOptional.get();
+        List <ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestorOrderById(requestor);
+        List<ItemRequestDto> itemRequestDto = itemRequestList.stream()
+                .map(ItemRequestMapper::toItemRequestDto).collect(Collectors.toList());
+        return itemRequestDto;
     }
 
     private void validate(ItemRequestDto itemRequest) {

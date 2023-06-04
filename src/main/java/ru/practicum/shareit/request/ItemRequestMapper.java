@@ -21,7 +21,7 @@ public class ItemRequestMapper {
         ItemRequestDto.Requestor requestor = new ItemRequestDto.Requestor(id, name);
         itemRequestDto.setRequestor(requestor);
         itemRequestDto.setCreated(itemRequest.getCreated());
-
+        itemRequestDto.setItems(itemRequest.getItems());
         return itemRequestDto;
     }
 
