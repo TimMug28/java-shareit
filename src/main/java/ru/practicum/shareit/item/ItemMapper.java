@@ -17,6 +17,7 @@ public class ItemMapper {
         String ownerName = item.getOwner().getName();
         ItemDto.Owner owner = new ItemDto.Owner(ownerId, ownerName);
         itemDto.setOwner(owner);
+        itemDto.setRequestId(item.getRequestId());
         return itemDto;
     }
 

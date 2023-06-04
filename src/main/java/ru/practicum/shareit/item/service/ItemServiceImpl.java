@@ -49,6 +49,7 @@ public class ItemServiceImpl implements ItemService {
         validate(item);
         User user = UserMapper.toUser(userService.findUserById(owner));
         item.setOwner(user);
+        item.setRequestId(itemDto.getRequestId());
         ItemDto createdItem = ItemMapper.toItemDto(itemRepository.save(item));
         log.info("Добавлена новая вещь: {}", createdItem);
 
@@ -113,8 +114,8 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() != null) {
             itemOld.setAvailable(itemDto.getAvailable());
         }
-        if (itemDto.getRequest() != null) {
-            itemOld.setRequest(itemDto.getRequest());
+        if (itemDto.getRequestId() != null) {
+            itemOld.setRequestId(itemDto.getRequestId());
         }
         ItemDto updateItem = ItemMapper.toItemDto(itemRepository.save(itemOld));
         log.info("Отредактирована вещь c id={}.", id);

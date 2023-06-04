@@ -14,7 +14,7 @@ public interface ItemMapperBooking {
         itemDto.setName(item.getName());
         itemDto.setDescription(item.getDescription());
         itemDto.setAvailable(item.getAvailable());
-        itemDto.setRequest(item.getRequest());
+        itemDto.setRequest(item.getRequestId());
         itemDto.setComments(item.getComments().stream()
                 .map(CommentMapper::toDTO)
                 .collect(Collectors.toList()));
@@ -28,7 +28,7 @@ public interface ItemMapperBooking {
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
-        item.setRequest(itemDto.getRequest());
+        item.setRequestId(itemDto.getRequest());
         item.setComments(itemDto.getComments().stream()
                 .map(dto -> CommentMapper.toComment(dto, user))
                 .collect(Collectors.toList()));
