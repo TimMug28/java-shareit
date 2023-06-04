@@ -5,9 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
-import ru.practicum.shareit.item.comment.CommentDto;
-import ru.practicum.shareit.item.comment.CommentMapper;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.ItemRequestMapper;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -62,10 +59,38 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             throw new NotFoundException("Пользователь не найден.");
         }
         User requestor = userOptional.get();
-        List <ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestorOrderById(requestor);
+        List <ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestorOrderByIdDesc(requestor);
         List<ItemRequestDto> itemRequestDto = itemRequestList.stream()
                 .map(ItemRequestMapper::toItemRequestDto).collect(Collectors.toList());
         return itemRequestDto;
+    }
+
+    @Override
+    public List<ItemRequestDto> getAllRequestOtherUsers(Long requesterId, Long from, Long size) {
+        if (size == 0|| from < 0 || size < 0){
+            log.info("Неверный формат from или size.");
+            throw new ValidationException("Неверный формат from или size.");
+        }
+        if (requesterId == null || requesterId < 0) {
+            log.info("Пустое поле id.");
+            throw new ValidationException("Поле id не может быть пустым или отрицательным.");
+        }
+        Optional<User> userOptional = userRepository.findById(requesterId);
+        if (userOptional.isEmpty()) {
+            log.info("Не найден пользователь с id:" + requesterId);
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        User requestor = userOptional.get();
+        List <ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestorNotOrderByIdDesc(requestor);
+        int startIndex = from.intValue();
+        int endIndex = Math.min(startIndex + size.intValue(), itemRequestList.size());
+
+        List<ItemRequestDto> itemRequestDtoList = itemRequestList.subList(startIndex, endIndex)
+                .stream()
+                .map(ItemRequestMapper::toItemRequestDto)
+                .collect(Collectors.toList());
+
+        return itemRequestDtoList;
     }
 
     private void validate(ItemRequestDto itemRequest) {

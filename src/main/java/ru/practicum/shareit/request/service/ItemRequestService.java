@@ -10,4 +10,5 @@ public interface ItemRequestService {
     ItemRequestDto createRequest (ItemRequestDto itemRequestDto, Long id);
 
     List<ItemRequestDto> getAllItemRequest (Long id);
+    List<ItemRequestDto> getAllRequestOtherUsers (Long requesterId,Long from, Long size);
 }

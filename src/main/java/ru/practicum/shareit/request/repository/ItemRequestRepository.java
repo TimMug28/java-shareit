@@ -8,5 +8,8 @@ import ru.practicum.shareit.user.model.User;
 import java.util.List;
 
 public interface ItemRequestRepository extends JpaRepository<ItemRequest, Long> {
-    List<ItemRequest> findAllByRequestorOrderById(User requestor);
+    List<ItemRequest> findAllByRequestorOrderByIdDesc(User requestor);
+
+    List<ItemRequest> findAllByRequestorNotOrderByIdDesc(User requestor);
+
 }
