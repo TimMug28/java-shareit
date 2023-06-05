@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.item.dto.ItemDtoForBooking;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
@@ -37,5 +35,12 @@ public class ItemRequestController {
                                                @RequestParam(name = "size", defaultValue = "20") Long size) {
         log.info("GET /requests/all - получение списка запросов, созданных  пользователями.");
         return itemRequestService.getAllRequestOtherUsers(requesterId, from, size);
+    }
+
+    @GetMapping("{requestId}")
+    public ItemRequestDto getItemRequestById(@RequestHeader("X-Sharer-User-Id") Long requesterId,
+                                             @PathVariable Long requestId) {
+        log.info("Получение запроса на вещь с определённым ID.");
+        return itemRequestService.getItemRequestById(requesterId, requestId);
     }
 }

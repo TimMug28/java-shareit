@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
-import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.ItemRequestMapper;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequest;
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
 public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository itemRequestRepository;
     private  final UserRepository userRepository;
-    private final ItemRepository itemRepository;
 
     @Override
     public ItemRequestDto createRequest(ItemRequestDto itemRequestDto, Long id) {
@@ -93,11 +91,29 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return itemRequestDtoList;
     }
 
+    @Override
+    public ItemRequestDto getItemRequestById(Long requesterId, Long requestId) {
+        if (requestId == null || requesterId == null) {
+            throw new ValidationException("Поле id не может быть пустым.");
+        }
+        Optional<User> userOptional = userRepository.findById(requesterId);
+        if (userOptional.isEmpty()) {
+            log.info("Не найден пользователь с id:" + requesterId);
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        Optional<ItemRequest> itemRequestOptional = itemRequestRepository.findById(requestId);
+        if (itemRequestOptional.isEmpty()) {
+            log.info("Не найден запрос с id:" + requesterId);
+            throw new NotFoundException("Запрос не найден.");
+        }
+        ItemRequest itemRequest = itemRequestOptional.get();
+        return ItemRequestMapper.toItemRequestDto(itemRequest);
+    }
+
     private void validate(ItemRequestDto itemRequest) {
         if (itemRequest.getDescription() == null || itemRequest.getDescription().isBlank()) {
             log.info("Пустое поле description.");
             throw new ValidationException("Поле description не может быть пустым.");
         }
     }
-
 }
