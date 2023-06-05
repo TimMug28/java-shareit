@@ -40,7 +40,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto createItem(ItemDto itemDto, Long owner) {
-
         Item item = ItemMapper.toItem(itemDto);
         if (owner == null) {
             log.info("Пустое поле owner.");
@@ -52,7 +51,6 @@ public class ItemServiceImpl implements ItemService {
         item.setRequestId(itemDto.getRequestId());
         ItemDto createdItem = ItemMapper.toItemDto(itemRepository.save(item));
         log.info("Добавлена новая вещь: {}", createdItem);
-
         return createdItem;
     }
 
@@ -123,19 +121,25 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoForBooking> getAllItems(Long ownerId) {
+    public List<ItemDtoForBooking> getAllItems(Long ownerId, Long from, Long size) {
+        if (size == 0|| from < 0 || size < 0){
+            log.info("Неверный формат from или size.");
+            throw new ValidationException("Неверный формат from или size.");
+        }
         Optional<User> userOptional = userRepository.findById(ownerId);
         if (userOptional.isEmpty()) {
             log.info("Не найден пользователь c id={}.", ownerId);
             throw new NotFoundException("Пользователь не найден.");
         }
         List<Item> items = itemRepository.findAllByOwnerOrderById(userOptional.get());
+        int startIndex = from.intValue();
+        int endIndex = Math.min(startIndex + size.intValue(), items.size());
+        List<Item> paginatedItems = items.subList(startIndex, endIndex);
         List<ItemDtoForBooking> itemDtoForBookingSet = new ArrayList<>();
         LocalDateTime localDateTime = LocalDateTime.now();
-        for (Item item : items) {
+        for (Item item : paginatedItems) {
             ItemDtoForBooking itemDtoForBooking = ItemMapperBooking.toDto(item);
             List<Booking> bookings = item.getBookings();
-
             Booking lastBooking = findLast(bookings, localDateTime);
             Booking nextBooking = findNext(bookings, localDateTime);
             itemDtoForBooking.setLastBooking(lastBooking != null
@@ -153,11 +157,18 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchForItemByDescription(String text, Long owner) {
+    public List<ItemDto> searchForItemByDescription(String text, Long owner, Long from, Long size) {
+        if (size == 0|| from < 0 || size < 0){
+            log.info("Неверный формат from или size.");
+            throw new ValidationException("Неверный формат from или size.");
+        }
         String description = text.toLowerCase();
         List<Item> itemList = itemRepository.searchItemsByDescription(text);
         log.info("Запрошены вещи по ключевому слову={}.", description);
-        return itemList
+        int startIndex = from.intValue();
+        int endIndex = Math.min(startIndex + size.intValue(), itemList.size());
+        List<Item> paginatedItemList = itemList.subList(startIndex, endIndex);
+        return paginatedItemList
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .filter(ItemDto::getAvailable)

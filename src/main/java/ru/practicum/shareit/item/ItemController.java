@@ -33,9 +33,11 @@ public class ItemController {
     }
 
     @GetMapping()
-    public List<ItemDtoForBooking> getAllItems(@RequestHeader("X-Sharer-User-Id") Long owner) {
+    public List<ItemDtoForBooking> getAllItems(@RequestHeader("X-Sharer-User-Id") Long owner,
+                                               @RequestParam(name = "from", defaultValue = "0") Long from,
+                                               @RequestParam(name = "size", defaultValue = "20") Long size) {
         log.info("GET /items - запрос вещей пользователя " + owner);
-        return itemService.getAllItems(owner);
+        return itemService.getAllItems(owner, from, size);
     }
 
     @PatchMapping("{itemId}")
@@ -48,10 +50,12 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> searchForItemByDescription(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long owner,
-                                                    @RequestParam(defaultValue = "null") String text
+                                                    @RequestParam(defaultValue = "null") String text,
+                                                    @RequestParam(name = "from", defaultValue = "0") Long from,
+                                                    @RequestParam(name = "size", defaultValue = "20") Long size
     ) {
         log.info("GET /items/search?text= " + text);
-        return itemService.searchForItemByDescription(text, owner);
+        return itemService.searchForItemByDescription(text, owner, from, size);
     }
 
     @PostMapping("{itemId}/comment")

@@ -42,11 +42,13 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> findBookingUsers(@RequestParam(value = "state", defaultValue = "ALL") String state,
-                                             @RequestHeader(value = "X-Sharer-User-Id") Long userId) {
+                                             @RequestHeader(value = "X-Sharer-User-Id") Long userId,
+                                             @RequestParam(name = "from", defaultValue = "0") Long from,
+                                             @RequestParam(name = "size", defaultValue = "20") Long size) {
         log.info("GET /bookings - получение списка бронирований пользователя.");
         try {
             StateEnum status = StateEnum.valueOf(state);
-            return bookingService.findBookingUsers(status, userId);
+            return bookingService.findBookingUsers(status, userId, from, size);
         } catch (IllegalArgumentException e) {
             throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
         }
@@ -54,11 +56,13 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingDto> getOwnerBookings(@RequestParam(value = "state", defaultValue = "ALL") String state,
-                                             @RequestHeader(value = "X-Sharer-User-Id") Long userId) {
+                                             @RequestHeader(value = "X-Sharer-User-Id") Long userId,
+                                             @RequestParam(name = "from", defaultValue = "0") Long from,
+                                             @RequestParam(name = "size", defaultValue = "20") Long size) {
         log.info("GET /bookings/owner - получение списка бронирований для всех вещей текущего пользователя.");
         try {
             StateEnum status = StateEnum.valueOf(state);
-            return bookingService.getOwnerBookings(userId, status);
+            return bookingService.getOwnerBookings(userId, status, from, size);
         } catch (IllegalArgumentException e) {
             throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
         }

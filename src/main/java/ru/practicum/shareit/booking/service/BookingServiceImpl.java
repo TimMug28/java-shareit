@@ -120,7 +120,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> findBookingUsers(StateEnum state, Long userId) {
+    public List<BookingDto> findBookingUsers(StateEnum state, Long userId, Long from, Long size) {
+        if (size == 0 || from < 0 || size < 0) {
+            log.info("Неверный формат from или size.");
+            throw new ValidationException("Неверный формат from или size.");
+        }
         Optional<User> booker = userRepository.findById(userId);
         if (booker.isEmpty()) {
             log.info("Не найден пользователь c id={}.", userId);
@@ -151,13 +155,20 @@ public class BookingServiceImpl implements BookingService {
             default:
                 break;
         }
-        return result.stream()
+        int startIndex = from.intValue();
+        int endIndex = Math.min(startIndex + size.intValue(), result.size());
+        List<Booking> paginatedResult = result.subList(startIndex, endIndex);
+        return paginatedResult.stream()
                 .map(BookingMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<BookingDto> getOwnerBookings(Long userId, StateEnum state) {
+    public List<BookingDto> getOwnerBookings(Long userId, StateEnum state, Long from, Long size) {
+        if (size == 0 || from < 0 || size < 0) {
+            log.info("Неверный формат from или size.");
+            throw new ValidationException("Неверный формат from или size.");
+        }
         Optional<User> owner = userRepository.findById(userId);
         if (owner.isEmpty()) {
             log.info("Не найден пользователь c id={}.", userId);
@@ -188,7 +199,12 @@ public class BookingServiceImpl implements BookingService {
             default:
                 break;
         }
-        return result.stream().map(BookingMapper::toDto).collect(Collectors.toList());
+        int startIndex = from.intValue();
+        int endIndex = Math.min(startIndex + size.intValue(), result.size());
+        List<Booking> paginatedResult = result.subList(startIndex, endIndex);
+        return paginatedResult.stream()
+                .map(BookingMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     private void validateDate(BookingDto bookingDto) {
