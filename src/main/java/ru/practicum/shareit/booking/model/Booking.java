@@ -2,10 +2,7 @@ package ru.practicum.shareit.booking.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.practicum.shareit.booking.Enum.StatusEnum;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
@@ -19,6 +16,7 @@ import java.time.LocalDateTime;
 @Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "bookings", schema = "public")
 public class Booking {
     @Id
