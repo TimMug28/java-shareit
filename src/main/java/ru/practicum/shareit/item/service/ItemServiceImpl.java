@@ -46,12 +46,18 @@ public class ItemServiceImpl implements ItemService {
             throw new ValidationException("Поле owner не может быть пустым.");
         }
         validate(item);
-        User user = UserMapper.toUser(userService.findUserById(owner));
+        Optional<User> getUser = userRepository.findById(owner);
+        if (getUser.isEmpty()) {
+            log.info("Не найден пользователь c id={}.", owner);
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        User user = getUser.get();
         item.setOwner(user);
         item.setRequestId(itemDto.getRequestId());
-        ItemDto createdItem = ItemMapper.toItemDto(itemRepository.save(item));
-        log.info("Добавлена новая вещь: {}", createdItem);
-        return createdItem;
+        Item createItem = itemRepository.save(item);
+        ItemDto createdItemDto = ItemMapper.toItemDto(createItem);
+        log.info("Добавлена новая вещь: {}", createdItemDto);
+        return createdItemDto;
     }
 
     @Override

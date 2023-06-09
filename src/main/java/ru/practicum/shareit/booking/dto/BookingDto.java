@@ -7,7 +7,7 @@ import ru.practicum.shareit.booking.Enum.StatusEnum;
 import java.time.LocalDateTime;
 
 @Data
-@Builder
+
 public class BookingDto {
     private Long id;
     private Long itemId;

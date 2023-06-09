@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class BookingServiceImplTest {
     @Mock
-    private BookingRepository bookingRepoitory;
+    private BookingRepository bookingRepository;
 
     @Mock
     private ItemRepository itemRepository;
@@ -57,8 +57,8 @@ class BookingServiceImplTest {
                 .id(1L).name("user").email("user@example.com")
                 .build();
 
-        user = User.builder()
-                .id(1L).name("user2").email("user2@example.com")
+        user2 = User.builder()
+                .id(2L).name("user2").email("user2@example.com")
                 .build();
 
         item = Item.builder()
@@ -72,36 +72,52 @@ class BookingServiceImplTest {
 
         booking = Booking.builder()
                 .id(1L)
-                .start(now.plusDays(1))
-                .end(now.plusDays(2))
+                .start(now.plusHours(1))
+                .end(now.plusHours(2))
                 .booker(user)
                 .item(item)
                 .status(StatusEnum.WAITING)
                 .build();
 
-        bookingDto = BookingDto.builder()
-                .id(1L)
-                .booker(new BookingDto.Booker(user.getId(),user.getName()))
-                .item(new BookingDto.Product(item.getId(), item.getName()))
-                .status(StatusEnum.WAITING)
-                .start(now.plusDays(1))
-                .end(now.plusDays(2))
-                .build();
+        bookingDto = new BookingDto();
+        bookingDto.setId(1L);
+        bookingDto.setBooker(new BookingDto.Booker(user.getId(), user.getName()));
+        bookingDto.setItem(new BookingDto.Product(item.getId(), item.getName()));
+        bookingDto.setStatus(StatusEnum.WAITING);
+        bookingDto.setStart(now.plusHours(1));
+        bookingDto.setEnd(now.plusHours(2));
+    }
 
+    @Test
+    void createBookingTest() {
+        bookingDto.setItemId(1L);
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        Mockito.when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
+        Mockito.when(bookingRepository.save(Mockito.any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        BookingDto createdBookingDto = bookingService.createBooking(bookingDto, 1L);
+        Assertions.assertThat(createdBookingDto).isNotNull();
+        Assertions.assertThat(createdBookingDto.getItemId()).isEqualTo(1L);
+        Assertions.assertThat(createdBookingDto.getStatus()).isEqualTo(StatusEnum.WAITING);
+
+        Mockito.verify(userRepository, Mockito.times(1)).findById(1L);
+        Mockito.verify(itemRepository, Mockito.times(1)).findById(1L);
+        Mockito.verify(bookingRepository, Mockito.times(1)).save(Mockito.any(Booking.class));
+        Mockito.verifyNoMoreInteractions(userRepository, itemRepository, bookingRepository);
     }
 
     @Test
     void createBookingExceptionTest() {
-        when(userRepository.findById(anyLong()))
+        when(userRepository.findById(eq(99L)))
                 .thenReturn(Optional.empty());
 
-        Throwable throwable = Assertions.catchException(() -> bookingService.createBooking(bookingDto,99L));
+        Throwable throwable = Assertions.catchThrowable(() -> bookingService.createBooking(bookingDto, 99L));
 
         Assertions.assertThat(throwable)
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Пользователь не найден.");
 
-        Mockito.verify(userRepository, times(1)).findById(anyLong());
+        Mockito.verify(userRepository, times(1)).findById(eq(99L));
         Mockito.verifyNoMoreInteractions(userRepository);
     }
 }

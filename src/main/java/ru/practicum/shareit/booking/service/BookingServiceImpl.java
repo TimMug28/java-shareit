@@ -40,11 +40,11 @@ public class BookingServiceImpl implements BookingService {
             throw new ValidationException("Поле owner не может быть пустым.");
         }
         Optional<User> userOptional = userRepository.findById(ownerId);
-        User booker = userOptional.get();
         if (userOptional.isEmpty()) {
             log.info("Не найден пользователь c id={}.", ownerId);
             throw new NotFoundException("Пользователь не найден.");
         }
+        User booker = userOptional.get();
         Optional<Item> itemOptional = itemRepository.findById(bookingDto.getItemId());
         if (itemOptional.isEmpty()) {
             ValidateUtil.throwNotFound(String.format("Вещь с %d не найдена.", bookingDto.getItemId()));

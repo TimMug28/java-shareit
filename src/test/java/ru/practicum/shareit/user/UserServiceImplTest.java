@@ -159,7 +159,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findUserById_WrongId_NotFoundException() {
+    void findUserByIdExceptionTest() {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
         Throwable thrown = Assertions.catchException(() -> userService.findUserById(99L));
