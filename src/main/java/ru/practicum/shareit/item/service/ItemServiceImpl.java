@@ -66,7 +66,7 @@ public class ItemServiceImpl implements ItemService {
         ValidateUtil.validNumberNotNull(id, "id вещи не должно быть null.");
         Optional<Item> itemOptional = itemRepository.findById(id);
         if (itemOptional.isEmpty()) {
-            ValidateUtil.throwNotFound(String.format("Вещь с %d не найдена.", id));
+            ValidateUtil.throwNotFound(String.format("Вещь с id %d не найдена.", id));
             return null;
         }
         Optional<User> owner = userRepository.findById(ownerId);
@@ -174,12 +174,13 @@ public class ItemServiceImpl implements ItemService {
         int startIndex = from.intValue();
         int endIndex = Math.min(startIndex + size.intValue(), itemList.size());
         List<Item> paginatedItemList = itemList.subList(startIndex, endIndex);
-        return paginatedItemList
+        List<ItemDto> result = paginatedItemList
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .filter(ItemDto::getAvailable)
                 .sorted(Comparator.comparing(ItemDto::getId))
                 .collect(Collectors.toList());
+        return result;
     }
 
     @Override

@@ -8,7 +8,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.practicum.shareit.booking.BookingItemMapper;
+import ru.practicum.shareit.booking.Enum.StatusEnum;
+import ru.practicum.shareit.booking.dto.BookingDtoItem;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.exceptions.ValidationException;
+import ru.practicum.shareit.item.comment.Comment;
+import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.comment.repository.CommentRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoForBooking;
@@ -19,12 +27,13 @@ import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,23 +52,38 @@ public class ItemServiceImplTest {
 
     @Mock
     private BookingRepository bookingRepository;
-
+    @Mock
+    private BookingItemMapper bookingItemMapper;
+    @Mock
+    private ItemMapper itemMapper;
     @InjectMocks
     private ItemServiceImpl itemService;
 
     private User user;
+    private User user2;
     private ItemDto itemDto;
     private Item item;
     private ItemDto itemDto2;
     private ItemDtoForBooking itemDtoForBooking;
     private Item item2;
+    private Long itemId;
+    private Long ownerId;
+    private List<Booking> bookings;
+    private List<Comment> comments;
 
     @BeforeEach
     void start() {
+
+
         user = User.builder()
                 .id(1L)
                 .name("user")
                 .email("user@yandex.ru")
+                .build();
+        user2 = User.builder()
+                .id(2L)
+                .name("user2")
+                .email("user2@yandex.ru")
                 .build();
 
         itemDto = new ItemDto();
@@ -76,9 +100,9 @@ public class ItemServiceImplTest {
                 .build();
 
         itemDto2 = new ItemDto();
-        itemDto2.setId(1L);
-        itemDto2.setName("лампочка");
-        itemDto2.setDescription("яркая лампочка");
+        itemDto2.setId(2L);
+        itemDto2.setName("утюг");
+        itemDto2.setDescription("электрический утюг");
         itemDto2.setAvailable(true);
         itemDto2.setRequestId(null);
 
@@ -87,17 +111,18 @@ public class ItemServiceImplTest {
         itemDtoForBooking.setName("лампочка");
         itemDtoForBooking.setDescription("яркая лампочка");
         itemDtoForBooking.setAvailable(true);
+
         itemDtoForBooking.setComments(new ArrayList<>());
-        itemDtoForBooking.setNextBooking(null);
-        itemDtoForBooking.setLastBooking(null);
 
         item2 = Item.builder()
                 .id(2L)
                 .name("утюг")
-                .description("просто утюг")
+                .description("электрический утюг")
                 .available(false)
                 .owner(user)
                 .build();
+
+
     }
 
 
@@ -120,5 +145,358 @@ public class ItemServiceImplTest {
         Mockito.verifyNoMoreInteractions(userRepository, itemRepository);
     }
 
+    @Test
+    void createItemExceptionTest() {
+        when(userRepository.findById(99L)).thenThrow(NotFoundException.class);
 
+        Throwable thrown = Assertions.catchException(() -> itemService.createItem(itemDto, 99L));
+
+        Assertions.assertThat(thrown)
+                .isInstanceOf(NotFoundException.class);
+
+        Mockito.verify(userRepository, Mockito.times(1)).findById(99L);
+        Mockito.verifyNoMoreInteractions(userRepository);
+        Mockito.verifyNoInteractions(itemRepository, itemRequestRepository);
+    }
+
+
+    @Test
+    void updateItem() {
+        ItemDto itemUpdate = new ItemDto();
+        itemUpdate.setId(1L);
+        itemUpdate.setName("itemUpdate");
+        itemUpdate.setDescription("update description");
+        itemUpdate.setAvailable(false);
+
+        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
+        when(itemRepository.save(any(Item.class))).thenReturn(item);
+
+        ItemDto updated = itemService.updateItem(1L, 1L, itemUpdate);
+
+        Assertions.assertThat(updated.getName()).isEqualTo("itemUpdate");
+        Assertions.assertThat(updated.getDescription()).isEqualTo("update description");
+        Assertions.assertThat(updated.getAvailable()).isEqualTo(false);
+
+        Mockito.verify(itemRepository, Mockito.times(1)).findById(1L);
+        Mockito.verify(itemRepository, Mockito.times(1)).save(any(Item.class));
+        Mockito.verifyNoMoreInteractions(itemRepository);
+    }
+
+    @Test
+    void updateItemExceptionTest() {
+        ItemDto itemUpdate = new ItemDto();
+        itemUpdate.setId(1L);
+        itemUpdate.setName("itemUpdate");
+        itemUpdate.setDescription("update description");
+        itemUpdate.setAvailable(false);
+
+        when(itemRepository.findById(99L)).thenThrow(NotFoundException.class);
+
+        Throwable thrown = Assertions.catchException(() -> itemService.updateItem(99L, 1L, itemUpdate));
+
+        Assertions.assertThat(thrown)
+                .isInstanceOf(NotFoundException.class);
+
+        Mockito.verify(itemRepository, Mockito.times(1)).findById(99L);
+        Mockito.verifyNoMoreInteractions(itemRepository);
+    }
+
+    @Test
+    void findItemByIdTest() {
+        itemId = 1L;
+        ownerId = 1L;
+        bookings = new ArrayList<>();
+        comments = new ArrayList<>();
+
+        LocalDateTime now = LocalDateTime.now();
+        Booking lastBooking = Booking.builder()
+                .id(1L)
+                .start(now.minusDays(1))
+                .end(now.minusHours(12))
+                .status(StatusEnum.APPROVED)
+                .build();
+        Booking nextBooking = Booking.builder()
+                .id(2L)
+                .start(now.plusHours(1))
+                .end(now.plusHours(2))
+                .status(StatusEnum.APPROVED)
+                .build();
+        bookings.add(lastBooking);
+        bookings.add(nextBooking);
+        item.setBookings(bookings);
+        item.setComments(comments);
+        BookingDtoItem last = new BookingDtoItem();
+        last.setId(1L);
+        last.setStart(now.minusDays(1));
+        last.setEnd(now.minusHours(12));
+        last.setStatus(StatusEnum.APPROVED);
+
+        BookingDtoItem next = new BookingDtoItem();
+        next.setId(2L);
+        next.setStart(now.plusHours(1));
+        next.setEnd(now.plusHours(2));
+        next.setStatus(StatusEnum.APPROVED);
+
+        item.setBookings(bookings);
+        item.setComments(comments);
+
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(user));
+        when(bookingItemMapper.toDto(eq(lastBooking))).thenReturn(last);
+        when(bookingItemMapper.toDto(eq(nextBooking))).thenReturn(next);
+
+        ItemDtoForBooking result = itemService.findItemById(itemId, ownerId);
+
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result.getId()).isEqualTo(itemId);
+        Assertions.assertThat(result.getName()).isEqualTo(item.getName());
+        Assertions.assertThat(result.getDescription()).isEqualTo(item.getDescription());
+        Assertions.assertThat(result.getComments()).isEmpty();
+        Assertions.assertThat(result.getLastBooking()).isNotNull();
+        Assertions.assertThat(result.getLastBooking().getId()).isEqualTo(lastBooking.getId());
+        Assertions.assertThat(result.getNextBooking()).isNotNull();
+        Assertions.assertThat(result.getNextBooking().getId()).isEqualTo(nextBooking.getId());
+
+        Mockito.verify(itemRepository, Mockito.times(1)).findById(itemId);
+        Mockito.verify(userRepository, Mockito.times(1)).findById(ownerId);
+        Mockito.verifyNoMoreInteractions(itemRepository, userRepository);
+    }
+
+    @Test
+    void findByIdExceptionTest() {
+
+        when(itemRepository.findById(99L)).thenReturn(Optional.empty());
+
+        Throwable thrown = Assertions.catchException(() -> itemService.findItemById(99L, 1L));
+
+        Assertions.assertThat(thrown)
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage(String.format("Вещь с id %d не найдена.", 99L));
+
+        Mockito.verify(itemRepository, Mockito.times(1)).findById(99L);
+        Mockito.verifyNoMoreInteractions(itemRepository);
+    }
+
+    @Test
+    void getAllItemsTest() {
+        ownerId = 1L;
+        Long from = 0L;
+        Long size = 10L;
+
+        List<Item> items = new ArrayList<>();
+        items.add(item);
+        items.add(item2);
+        bookings = new ArrayList<>();
+        comments = new ArrayList<>();
+        List<Comment> comments2 = new ArrayList<>();
+        Comment comment = new Comment(1L, "комментарий", item, user, LocalDateTime.now());
+        Comment comment2 = new Comment(2L, "комментарий2", item2, user, LocalDateTime.now());
+        comments.add(comment);
+        comments2.add(comment2);
+        item.setBookings(bookings);
+        item2.setBookings(bookings);
+        item.setComments(comments);
+        item2.setComments(comments2);
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(user));
+        when(itemRepository.findAllByOwnerOrderById(user)).thenReturn(items);
+
+        List<ItemDtoForBooking> result = itemService.getAllItems(ownerId, from, size);
+
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result).hasSize(2);
+        Assertions.assertThat(result.get(0).getId()).isEqualTo(1L);
+        Assertions.assertThat(result.get(0).getName()).isEqualTo("лампочка");
+        Assertions.assertThat(result.get(1).getId()).isEqualTo(2L);
+        Assertions.assertThat(result.get(1).getName()).isEqualTo("утюг");
+
+        Mockito.verify(userRepository, Mockito.times(1)).findById(ownerId);
+        Mockito.verify(itemRepository, Mockito.times(1)).findAllByOwnerOrderById(user);
+        Mockito.verifyNoMoreInteractions(userRepository, itemRepository, bookingItemMapper, commentRepository);
+    }
+
+
+    @Test
+    void getAllItemsValidationExceptionTest() {
+        ownerId = 1L;
+        Long from = -1L;
+        Long size = 0L;
+
+        Assertions.assertThatThrownBy(() -> itemService.getAllItems(ownerId, from, size))
+                .isInstanceOf(ValidationException.class)
+                .hasMessage("Неверный формат from или size.");
+
+        Mockito.verifyNoInteractions(userRepository, itemRepository, bookingItemMapper, commentRepository);
+    }
+
+    @Test
+    void getAllItemsNotFoundExceptionTest() {
+        ownerId = 1L;
+
+        when(userRepository.findById(ownerId)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> itemService.getAllItems(ownerId, 0L, 10L))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Пользователь не найден.");
+
+        Mockito.verify(userRepository, Mockito.times(1)).findById(ownerId);
+        Mockito.verifyNoMoreInteractions(userRepository);
+    }
+
+    @Test
+    void searchForItemByDescriptionTest() {
+        item2.setAvailable(true);
+        List<Item> items = List.of(item2);
+        String text = "утюг";
+        when(itemRepository.searchItemsByDescription(text)).thenReturn(items);
+
+        List<ItemDto> itemDtos = itemService.searchForItemByDescription(text, 1L, 0L, 5L);
+
+        Assertions.assertThat(itemDtos)
+                .hasSize(1);
+
+        Mockito.verify(itemRepository, Mockito.times(1))
+                .searchItemsByDescription(text);
+        Mockito.verifyNoMoreInteractions(itemRepository);
+    }
+
+
+    @Test
+    void searchForItemByDescriptionValidationExceptionTest() {
+        Assertions.assertThatThrownBy(() -> itemService.searchForItemByDescription("дрель", 1L, -1L, 10L))
+                .isInstanceOf(ValidationException.class);
+
+        Mockito.verifyNoInteractions(itemRepository, itemMapper);
+    }
+
+    @Test
+    void searchForItemByDescriptionReturnsEmptyTest() {
+        String text = "дрель";
+
+        List<Item> items = new ArrayList<>();
+
+        when(itemRepository.searchItemsByDescription(text)).thenReturn(items);
+
+        List<ItemDto> result = itemService.searchForItemByDescription(text, 1L, 0L, 10L);
+
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result).isEmpty();
+
+        Mockito.verify(itemRepository, Mockito.times(1)).searchItemsByDescription(text);
+        Mockito.verifyNoMoreInteractions(itemRepository, itemMapper);
+    }
+
+    @Test
+    void createCommentTest2() {
+        LocalDateTime now = LocalDateTime.now();
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("комментарий");
+
+        User user = new User();
+        user.setId(1L);
+
+        Item item = new Item();
+        item.setId(1L);
+        item.setOwner(new User());
+
+        Booking booking = Booking.builder()
+                .id(1L)
+                .start(now.minusDays(2))
+                .end(now.minusDays(1))
+                .status(StatusEnum.APPROVED)
+                .item(item)
+                .booker(user)
+                .build();
+        List<Booking> bookings = new ArrayList<>();
+        bookings.add(booking);
+        item.setBookings(bookings);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
+        when(commentRepository.save(any(Comment.class))).thenAnswer(invocation -> {
+            Comment savedComment = invocation.getArgument(0);
+            savedComment.setId(1L);
+            return savedComment;
+        });
+
+        CommentDto result = itemService.createComment(commentDto, 1L, 1L);
+
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+        assertEquals(commentDto.getText(), result.getText());
+
+        Mockito.verify(commentRepository, Mockito.times(1)).save(any(Comment.class));
+        Mockito.verifyNoMoreInteractions(commentRepository);
+    }
+
+    @Test
+    void createCommentEmptyTextValidationExceptionTest() {
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("");
+        Long itemId = 1L;
+        Long userId = 1L;
+
+        assertThrows(ValidationException.class, () ->
+                itemService.createComment(commentDto, itemId, userId)
+        );
+
+        Mockito.verifyNoInteractions(userRepository, itemRepository, commentRepository);
+    }
+
+    @Test
+    void createCommentUserNotFoundExceptionTest() {
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("комментарий");
+        Long itemId = 1L;
+        Long userId = 1L;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () ->
+                itemService.createComment(commentDto, itemId, userId)
+        );
+
+        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
+        Mockito.verifyNoMoreInteractions(userRepository, itemRepository, commentRepository);
+    }
+
+    @Test
+    void createCommentNotFoundExceptionTest() {
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("комментарий");
+        Long itemId = 1L;
+        Long userId = 1L;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
+        when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () ->
+                itemService.createComment(commentDto, itemId, userId)
+        );
+
+        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
+        Mockito.verify(itemRepository, Mockito.times(1)).findById(itemId);
+        Mockito.verifyNoMoreInteractions(userRepository, itemRepository, commentRepository);
+    }
+
+    @Test
+    void createCommentValidationException() {
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("комментарий");
+        Long itemId = 1L;
+        Long userId = 1L;
+        User user = new User();
+        Item item = new Item();
+        item.setOwner(user);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+
+        assertThrows(ValidationException.class, () ->
+                itemService.createComment(commentDto, itemId, userId)
+        );
+
+        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
+        Mockito.verify(itemRepository, Mockito.times(1)).findById(itemId);
+        Mockito.verifyNoMoreInteractions(userRepository, itemRepository, commentRepository);
+    }
 }
