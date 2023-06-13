@@ -174,13 +174,12 @@ public class ItemServiceImpl implements ItemService {
         int startIndex = from.intValue();
         int endIndex = Math.min(startIndex + size.intValue(), itemList.size());
         List<Item> paginatedItemList = itemList.subList(startIndex, endIndex);
-        List<ItemDto> result = paginatedItemList
+        return paginatedItemList
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .filter(ItemDto::getAvailable)
                 .sorted(Comparator.comparing(ItemDto::getId))
                 .collect(Collectors.toList());
-        return result;
     }
 
     @Override
