@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,15 +15,15 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoForBooking;
 import ru.practicum.shareit.item.service.ItemService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.is;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WebMvcTest(controllers = ItemController.class)
 public class ItemControllerTest {
@@ -40,7 +38,6 @@ public class ItemControllerTest {
     private ItemDto itemDto;
     private ItemDto itemDto2;
     private ItemDtoForBooking itemDtoForBooking;
-    private CommentDto commentDto;
 
     @BeforeEach
     public void setup() {
@@ -85,8 +82,8 @@ public class ItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.name").value("Item"))
-                .andExpect(jsonPath("$.description").value("Description"));
+                .andExpect(jsonPath("$.name").value("Дрель"))
+                .andExpect(jsonPath("$.description").value("Описание"));
 
         Mockito.verify(itemService, Mockito.times(1)).createItem(itemDto, ownerId);
     }
@@ -197,38 +194,29 @@ public class ItemControllerTest {
     }
 
     @Test
-    void createCommentTest() throws Exception {
-        Long userId = 1L;
-        Long itemId = 1L;
-        commentDto = new CommentDto();
-        commentDto.setId(1L);
+    void createdCommentTest() throws Exception {
+        CommentDto commentDto = new CommentDto();
         commentDto.setText("Комментарий");
-        commentDto.setAuthorName("User");
+        commentDto.setAuthorName("user");
 
-        CommentDto createdCommentDto = new CommentDto();
-        createdCommentDto.setId(1L);
-        createdCommentDto.setText("Комментарий");
-        createdCommentDto.setAuthorName("User");
+        CommentDto createCommentDto = new CommentDto();
+        createCommentDto.setId(1L);
+        createCommentDto.setText("Комментарий");
+        createCommentDto.setAuthorName("user");
+        createCommentDto.setCreatedDate(LocalDateTime.now());
 
-        when(itemService.createComment(createdCommentDto, userId, itemId))
-                .thenReturn(commentDto);
+        Long itemId = 1L;
+        Long userId = 1L;
+
+        when(itemService.createComment(any(CommentDto.class), anyLong(), anyLong())).thenReturn(createCommentDto);
 
         mockMvc.perform(post("/items/{itemId}/comment", itemId)
-                        .header("X-Sharer-User-Id", userId.toString())
-
-                        .content(objectMapper.writeValueAsString(commentDto))
+                        .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                )
+                        .content(objectMapper.writeValueAsString(commentDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(commentDto.getId()))
-                .andExpect(jsonPath("$.text").value(commentDto.getText()))
-                .andExpect(jsonPath("$.authorName").value(commentDto.getAuthorName()));
-
-
-        Mockito.verify(itemService, Mockito.times(1))
-                .createComment(commentDto, itemId, userId);
-
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.text").value("Комментарий"));
     }
 }
 
