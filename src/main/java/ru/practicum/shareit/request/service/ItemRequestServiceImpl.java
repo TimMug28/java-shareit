@@ -40,7 +40,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         validate(itemRequestDto);
         ItemRequest itemRequest = ItemRequestMapper.toItemRequest(itemRequestDto, time);
         itemRequest.setRequestor(userOptional.get());
-        ItemRequestDto itemRequestDtoCreated =ItemRequestMapper.toItemRequestDto( itemRequestRepository.save(itemRequest));
+        ItemRequestDto itemRequestDtoCreated = ItemRequestMapper.toItemRequestDto(itemRequestRepository.save(itemRequest));
         log.info("Добавлен новый запрос: {}", itemRequestDtoCreated.getId());
         return itemRequestDtoCreated;
     }
@@ -57,7 +57,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             throw new NotFoundException("Пользователь не найден.");
         }
         User requestor = userOptional.get();
-        List <ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestorOrderByIdDesc(requestor);
+        List<ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestorOrderByIdDesc(requestor);
         List<ItemRequestDto> itemRequestDto = itemRequestList.stream()
                 .map(ItemRequestMapper::toItemRequestDto).collect(Collectors.toList());
         return itemRequestDto;
@@ -65,7 +65,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestDto> getAllRequestOtherUsers(Long requesterId, Long from, Long size) {
-        if (size == 0|| from < 0 || size < 0){
+        if (size == 0 || from < 0 || size < 0) {
             log.info("Неверный формат from или size.");
             throw new ValidationException("Неверный формат from или size.");
         }
@@ -79,7 +79,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             throw new NotFoundException("Пользователь не найден.");
         }
         User requestor = userOptional.get();
-        List <ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestorNotOrderByIdDesc(requestor);
+        List<ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestorNotOrderByIdDesc(requestor);
         int startIndex = from.intValue();
         int endIndex = Math.min(startIndex + size.intValue(), itemRequestList.size());
 
