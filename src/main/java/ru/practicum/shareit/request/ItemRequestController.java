@@ -16,6 +16,7 @@ import java.util.List;
 @RequestMapping(path = "/requests")
 public class ItemRequestController {
     private final ItemRequestService itemRequestService;
+
     @PostMapping
     public ItemRequestDto createRequest(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long owner,
                                         @RequestBody @Validated ItemRequestDto itemRequestDto) {
