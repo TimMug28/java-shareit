@@ -59,7 +59,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDtoForBooking findItemById(Long id, Long ownerId) {
-
         ValidateUtil.validNumberNotNull(id, "id вещи не должно быть null.");
         Optional<Item> itemOptional = itemRepository.findById(id);
         if (itemOptional.isEmpty()) {
@@ -125,7 +124,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDtoForBooking> getAllItems(Long ownerId, Long from, Long size) {
-        if (size == 0|| from < 0 || size < 0){
+        if (size == 0 || from < 0 || size < 0) {
             log.info("Неверный формат from или size.");
             throw new ValidationException("Неверный формат from или size.");
         }
@@ -161,7 +160,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchForItemByDescription(String text, Long owner, Long from, Long size) {
-        if (size == 0|| from < 0 || size < 0){
+        if (size == 0 || from < 0 || size < 0) {
             log.info("Неверный формат from или size.");
             throw new ValidationException("Неверный формат from или size.");
         }
