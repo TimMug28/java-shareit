@@ -8,7 +8,7 @@ import ru.practicum.shareit.user.model.User;
 import java.util.stream.Collectors;
 
 public interface ItemMapperBooking {
-    public static ItemDtoForBooking toDto(Item item) {
+    static ItemDtoForBooking toDto(Item item) {
         ItemDtoForBooking itemDto = new ItemDtoForBooking();
         itemDto.setId(item.getId());
         itemDto.setName(item.getName());
@@ -22,7 +22,7 @@ public interface ItemMapperBooking {
         return itemDto;
     }
 
-    public static Item toItem(ItemDtoForBooking itemDto, User user) {
+    static Item toItem(ItemDtoForBooking itemDto, User user) {
         Item item = new Item();
         item.setId(itemDto.getId());
         item.setName(itemDto.getName());

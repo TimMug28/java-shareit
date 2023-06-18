@@ -12,8 +12,6 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    List<Booking> findByBooker_Id(Long id);
-
     //ALL для Booker
     @Query("select b from Booking b where b.booker = ?1 order by b.start DESC")
     List<Booking> findAllBookingsByBooker(User user);
@@ -22,7 +20,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllByBookerAndStartAfterOrderByStartDesc(User user, LocalDateTime localDateTime);
 
     // REJECTED and WAITING для Booker
-
     List<Booking> findAllByBookerAndStatusEqualsOrderByStartDesc(
             User user, StatusEnum statusEnum);
 

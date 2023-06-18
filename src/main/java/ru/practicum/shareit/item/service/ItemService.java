@@ -17,7 +17,5 @@ public interface ItemService {
 
     List<ItemDto> searchForItemByDescription(String text, Long owner, Long from, Long size);
 
-    public List<ItemDto> findItemsByUserId(Long ownerId);
-
     CommentDto createComment(CommentDto commentDto, Long itemId, Long userId);
 }
