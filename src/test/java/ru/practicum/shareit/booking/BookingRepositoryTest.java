@@ -196,29 +196,14 @@ class BookingRepositoryTest {
 
     @Test
     void testFindAllByItem_OwnerAndEndIsBeforeOrderByStartDesc() {
-        LocalDateTime endDate = LocalDateTime.now().minusDays(1);
+        LocalDateTime endDate = LocalDateTime.now();
+        List<Booking> bookings = bookingRepository.findAllByItem_OwnerAndEndIsBeforeOrderByStartDesc(owner, endDate);
 
-        Booking booking1 = Booking.builder()
-                .start(LocalDateTime.now().minusDays(2))
-                .end(endDate)
-                .item(item)
-                .build();
-        booking1.setStatus(StatusEnum.APPROVED);
-        bookingRepository.save(booking1);
-
-        Booking booking2 = Booking.builder()
-                .start(LocalDateTime.now().minusDays(1))
-                .end(LocalDateTime.now())
-                .item(item)
-                .build();
-        booking2.setStatus(StatusEnum.APPROVED);
-        bookingRepository.save(booking2);
-
-        List<Booking> bookingList = bookingRepository.findAllByItem_OwnerAndEndIsBeforeOrderByStartDesc(owner, endDate);
-
-        assertNotNull(bookingList);
-        assertEquals(0, bookingList.size());
+        assertNotNull(bookings);
+        assertEquals(1, bookings.size());
+        assertEquals(booking1.getId(), bookings.get(0).getId());
     }
+
 
     @Test
     void testFindAllByItem_OwnerAndStartBeforeAndEndAfterOrderByStartDesc() {

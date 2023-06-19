@@ -146,7 +146,6 @@ public class ItemRequestControllerTest {
 
         verify(itemRequestService, times(1)).getItemRequestById(requesterId, requestId);
     }
-
 }
 
 
