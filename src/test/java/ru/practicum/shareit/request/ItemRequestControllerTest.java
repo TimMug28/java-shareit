@@ -57,7 +57,8 @@ public class ItemRequestControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1L));
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.description").value("описание"));
 
         verify(itemRequestService, times(1)).createRequest(any(ItemRequestDto.class), eq(ownerId));
     }
