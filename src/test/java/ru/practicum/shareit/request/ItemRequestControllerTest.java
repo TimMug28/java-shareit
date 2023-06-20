@@ -35,15 +35,12 @@ public class ItemRequestControllerTest {
     @Test
     public void createRequestTest() throws Exception {
         Long ownerId = 1L;
-        ItemRequestDto.Requestor requestor = new ItemRequestDto.Requestor(1L, "user");
         ItemRequestDto itemRequestDto = new ItemRequestDto();
         itemRequestDto.setDescription("описание");
-        itemRequestDto.setRequestor(requestor);
 
         ItemRequestDto createdItemRequestDto = new ItemRequestDto();
         createdItemRequestDto.setId(1L);
         createdItemRequestDto.setDescription("описание");
-        createdItemRequestDto.setRequestor(requestor);
         createdItemRequestDto.setCreated(LocalDateTime.of(2023,10,5,16,23));
 
         when(itemRequestService.createRequest(any(ItemRequestDto.class),anyLong()))

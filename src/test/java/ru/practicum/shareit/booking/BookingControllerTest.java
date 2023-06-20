@@ -38,16 +38,11 @@ public class BookingControllerTest {
     public void createBookingTest() throws Exception {
         Long ownerId = 1L;
 
-        BookingDto.Booker booker = new BookingDto.Booker(1L, "user");
-        BookingDto.Product product = new BookingDto.Product(1L, "item");
-
         BookingDto bookingDto = new BookingDto();
         bookingDto.setItemId(1L);
         bookingDto.setStart(LocalDateTime.of(2023,10,5,16,23));
         bookingDto.setEnd(LocalDateTime.of(2023,10,5,16,23).plusHours(1));
         bookingDto.setStatus(StatusEnum.APPROVED);
-        bookingDto.setBooker(booker);
-        bookingDto.setItem(product);
 
         BookingDto createdBookingDto = new BookingDto();
         createdBookingDto.setId(1L);
@@ -55,8 +50,6 @@ public class BookingControllerTest {
         createdBookingDto.setStart(LocalDateTime.of(2023,10,5,16,23));
         createdBookingDto.setEnd(LocalDateTime.of(2023,10,5,16,23).plusHours(1));
         createdBookingDto.setStatus(StatusEnum.APPROVED);
-        createdBookingDto.setBooker(booker);
-        createdBookingDto.setItem(product);
 
         when(bookingService.createBooking(any(BookingDto.class), anyLong()))
                 .thenReturn(createdBookingDto);
