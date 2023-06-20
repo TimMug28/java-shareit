@@ -61,6 +61,7 @@ public class ItemRequestControllerTest {
                 .andExpect(jsonPath("$.id", is(createdItemRequestDto.getId()), Long.class))
                 .andExpect(jsonPath("$.description", is(createdItemRequestDto.getDescription())));
     }
+
     @Test
     void getAllItemRequestTest() throws Exception {
         Long userId = 1L;
