@@ -58,8 +58,8 @@ public class BookingControllerTest {
         createdBookingDto.setBooker(booker);
         createdBookingDto.setItem(product);
 
-        when(bookingService.createBooking(any(BookingDto.class), eq(ownerId))).thenReturn(createdBookingDto);
-
+        when(bookingService.createBooking(any(BookingDto.class), anyLong()))
+                .thenReturn(createdBookingDto);
         mockMvc.perform(post("/bookings")
                         .header("X-Sharer-User-Id", ownerId)
                         .content(objectMapper.writeValueAsString(bookingDto))

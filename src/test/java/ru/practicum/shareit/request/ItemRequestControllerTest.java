@@ -47,7 +47,7 @@ public class ItemRequestControllerTest {
         createdItemRequestDto.setRequestor(requestor);
         createdItemRequestDto.setCreated(LocalDateTime.of(2023,10,5,16,23));
 
-        when(itemRequestService.createRequest(any(ItemRequestDto.class), eq(ownerId)))
+        when(itemRequestService.createRequest(any(ItemRequestDto.class),anyLong()))
                 .thenReturn(createdItemRequestDto);
 
         mockMvc.perform(post("/requests")
