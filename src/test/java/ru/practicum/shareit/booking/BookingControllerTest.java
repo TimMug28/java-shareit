@@ -43,8 +43,8 @@ public class BookingControllerTest {
 
         BookingDto bookingDto = new BookingDto();
         bookingDto.setItemId(1L);
-        bookingDto.setStart(LocalDateTime.now());
-        bookingDto.setEnd(LocalDateTime.now().plusHours(1));
+        bookingDto.setStart(LocalDateTime.of(2023,10,5,16,23));
+        bookingDto.setEnd(LocalDateTime.of(2023,10,5,16,23).plusHours(1));
         bookingDto.setStatus(StatusEnum.APPROVED);
         bookingDto.setBooker(booker);
         bookingDto.setItem(product);
@@ -52,8 +52,8 @@ public class BookingControllerTest {
         BookingDto createdBookingDto = new BookingDto();
         createdBookingDto.setId(1L);
         createdBookingDto.setItemId(1L);
-        createdBookingDto.setStart(LocalDateTime.now());
-        createdBookingDto.setEnd(LocalDateTime.now().plusHours(1));
+        createdBookingDto.setStart(LocalDateTime.of(2023,10,5,16,23));
+        createdBookingDto.setEnd(LocalDateTime.of(2023,10,5,16,23).plusHours(1));
         createdBookingDto.setStatus(StatusEnum.APPROVED);
         createdBookingDto.setBooker(booker);
         createdBookingDto.setItem(product);
@@ -105,8 +105,8 @@ public class BookingControllerTest {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setId(bookingId);
         bookingDto.setItemId(1L);
-        bookingDto.setStart(LocalDateTime.now());
-        bookingDto.setEnd(LocalDateTime.now().plusHours(1));
+        bookingDto.setStart(LocalDateTime.of(2023,10,5,16,23));
+        bookingDto.setEnd(LocalDateTime.of(2023,10,5,16,23).plusHours(1));
         bookingDto.setStatus(StatusEnum.APPROVED);
 
         when(bookingService.getBookingDetails(bookingId, userId)).thenReturn(bookingDto);
@@ -130,14 +130,14 @@ public class BookingControllerTest {
 
         BookingDto bookingDto1 = new BookingDto();
         bookingDto1.setId(1L);
-        bookingDto1.setStart(LocalDateTime.now());
-        bookingDto1.setEnd(LocalDateTime.now().plusHours(1));
+        bookingDto1.setStart(LocalDateTime.of(2023,10,5,16,23));
+        bookingDto1.setEnd(LocalDateTime.of(2023,10,5,16,23).plusHours(1));
         bookingDto1.setStatus(StatusEnum.APPROVED);
 
         BookingDto bookingDto2 = new BookingDto();
         bookingDto2.setId(2L);
-        bookingDto2.setStart(LocalDateTime.now().plusHours(1));
-        bookingDto2.setEnd(LocalDateTime.now().plusHours(2));
+        bookingDto2.setStart(LocalDateTime.of(2023,10,5,16,23).plusHours(1));
+        bookingDto2.setEnd(LocalDateTime.of(2023,10,5,16,23).plusHours(2));
         bookingDto2.setStatus(StatusEnum.WAITING);
 
         List<BookingDto> bookingList = Arrays.asList(bookingDto1, bookingDto2);
@@ -169,14 +169,14 @@ public class BookingControllerTest {
 
         BookingDto bookingDto1 = new BookingDto();
         bookingDto1.setId(1L);
-        bookingDto1.setStart(LocalDateTime.now());
-        bookingDto1.setEnd(LocalDateTime.now().plusHours(1));
+        bookingDto1.setStart(LocalDateTime.of(2023,10,5,16,23));
+        bookingDto1.setEnd(LocalDateTime.of(2023,10,5,16,23).plusHours(1));
         bookingDto1.setStatus(StatusEnum.APPROVED);
 
         BookingDto bookingDto2 = new BookingDto();
         bookingDto2.setId(2L);
-        bookingDto2.setStart(LocalDateTime.now().plusHours(1));
-        bookingDto2.setEnd(LocalDateTime.now().plusHours(2));
+        bookingDto2.setStart(LocalDateTime.of(2023,10,5,16,23).plusHours(1));
+        bookingDto2.setEnd(LocalDateTime.of(2023,10,5,16,23).plusHours(2));
         bookingDto2.setStatus(StatusEnum.WAITING);
 
         List<BookingDto> bookingList = Arrays.asList(bookingDto1, bookingDto2);

@@ -45,7 +45,7 @@ public class ItemRequestControllerTest {
         createdItemRequestDto.setId(1L);
         createdItemRequestDto.setDescription("описание");
         createdItemRequestDto.setRequestor(requestor);
-        createdItemRequestDto.setCreated(LocalDateTime.now());
+        createdItemRequestDto.setCreated(LocalDateTime.of(2023,10,5,16,23));
 
         when(itemRequestService.createRequest(any(ItemRequestDto.class), eq(ownerId)))
                 .thenReturn(createdItemRequestDto);
