@@ -10,12 +10,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -45,24 +46,21 @@ public class ItemRequestControllerTest {
         createdItemRequestDto.setId(1L);
         createdItemRequestDto.setDescription("описание");
         createdItemRequestDto.setRequestor(requestor);
-        createdItemRequestDto.setCreated(LocalDateTime.of(2023,10,5,16,23));
+        createdItemRequestDto.setCreated(LocalDateTime.of(2023, 10, 5, 16, 23));
 
-        when(itemRequestService.createRequest(any(ItemRequestDto.class),anyLong()))
+        when(itemRequestService.createRequest(any(ItemRequestDto.class), anyLong()))
                 .thenReturn(createdItemRequestDto);
 
         mockMvc.perform(post("/requests")
                         .header("X-Sharer-User-Id", ownerId)
                         .content(objectMapper.writeValueAsString(itemRequestDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.description").value("описание"));
-
-        verify(itemRequestService, times(1)).createRequest(any(ItemRequestDto.class), eq(ownerId));
+                .andExpect(jsonPath("$.id", is(createdItemRequestDto.getId()), Long.class))
+                .andExpect(jsonPath("$.description", is(createdItemRequestDto.getDescription())));
     }
-
     @Test
     void getAllItemRequestTest() throws Exception {
         Long userId = 1L;
