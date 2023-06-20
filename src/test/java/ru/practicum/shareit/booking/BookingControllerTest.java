@@ -12,12 +12,10 @@ import ru.practicum.shareit.booking.Enum.StatusEnum;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -65,13 +63,13 @@ public class BookingControllerTest {
         mockMvc.perform(post("/bookings")
                         .header("X-Sharer-User-Id", ownerId)
                         .content(objectMapper.writeValueAsString(bookingDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(createdBookingDto.getId()), Long.class))
-                .andExpect(jsonPath("$.item.id", is(createdBookingDto.getItem().getId()), Long.class))
-                .andExpect(jsonPath("$.booker.id", is(createdBookingDto.getBooker().getId()), Long.class));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.itemId").value(1L))
+                .andExpect(jsonPath("$.status").value("APPROVED"));
     }
 
     @Test
