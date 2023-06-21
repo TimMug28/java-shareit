@@ -21,7 +21,7 @@ public class BookingMapperTest {
 
         User booker = new User();
         booker.setId(2L);
-        booker.setName("запрос");
+        booker.setName("booker");
 
         Booking booking = new Booking();
         booking.setId(1L);
@@ -55,11 +55,11 @@ public class BookingMapperTest {
 
         Item item = new Item();
         item.setId(dto.getItemId());
-        item.setName("Test Item");
+        item.setName("вещь");
 
         User booker = new User();
         booker.setId(2L);
-        booker.setName("Test Booker");
+        booker.setName("booker");
 
         Booking booking = BookingMapper.toBooking(dto, booker, item);
 
