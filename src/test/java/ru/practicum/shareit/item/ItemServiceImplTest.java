@@ -12,7 +12,6 @@ import ru.practicum.shareit.booking.BookingItemMapper;
 import ru.practicum.shareit.booking.Enum.StatusEnum;
 import ru.practicum.shareit.booking.dto.BookingDtoItem;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.comment.Comment;
@@ -51,8 +50,6 @@ public class ItemServiceImplTest {
     private CommentRepository commentRepository;
 
     @Mock
-    private BookingRepository bookingRepository;
-    @Mock
     private BookingItemMapper bookingItemMapper;
     @Mock
     private ItemMapper itemMapper;
@@ -60,10 +57,8 @@ public class ItemServiceImplTest {
     private ItemServiceImpl itemService;
 
     private User user;
-    private User user2;
     private ItemDto itemDto;
     private Item item;
-    private ItemDto itemDto2;
     private ItemDtoForBooking itemDtoForBooking;
     private Item item2;
     private Long itemId;
@@ -80,11 +75,6 @@ public class ItemServiceImplTest {
                 .name("user")
                 .email("user@yandex.ru")
                 .build();
-        user2 = User.builder()
-                .id(2L)
-                .name("user2")
-                .email("user2@yandex.ru")
-                .build();
 
         itemDto = new ItemDto();
         itemDto.setName("лампочка");
@@ -98,13 +88,6 @@ public class ItemServiceImplTest {
                 .available(true)
                 .owner(user)
                 .build();
-
-        itemDto2 = new ItemDto();
-        itemDto2.setId(2L);
-        itemDto2.setName("утюг");
-        itemDto2.setDescription("электрический утюг");
-        itemDto2.setAvailable(true);
-        itemDto2.setRequestId(null);
 
         itemDtoForBooking = new ItemDtoForBooking();
         itemDtoForBooking.setId(1L);
@@ -121,10 +104,7 @@ public class ItemServiceImplTest {
                 .available(false)
                 .owner(user)
                 .build();
-
-
     }
-
 
     @Test
     void createItemTest() {
@@ -158,7 +138,6 @@ public class ItemServiceImplTest {
         Mockito.verifyNoMoreInteractions(userRepository);
         Mockito.verifyNoInteractions(itemRepository, itemRequestRepository);
     }
-
 
     @Test
     void updateItem() {
@@ -314,7 +293,6 @@ public class ItemServiceImplTest {
         Mockito.verifyNoMoreInteractions(userRepository, itemRepository, bookingItemMapper, commentRepository);
     }
 
-
     @Test
     void getAllItemsValidationExceptionTest() {
         ownerId = 1L;
@@ -358,7 +336,6 @@ public class ItemServiceImplTest {
                 .searchItemsByDescription(text);
         Mockito.verifyNoMoreInteractions(itemRepository);
     }
-
 
     @Test
     void searchForItemByDescriptionValidationExceptionTest() {
@@ -491,9 +468,7 @@ public class ItemServiceImplTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
 
-        assertThrows(ValidationException.class, () ->
-                itemService.createComment(commentDto, itemId, userId)
-        );
+        assertThrows(ValidationException.class, () -> itemService.createComment(commentDto, itemId, userId));
 
         Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
         Mockito.verify(itemRepository, Mockito.times(1)).findById(itemId);

@@ -166,7 +166,7 @@ class UserServiceImplTest {
 
         Assertions.assertThat(thrown)
                 .isInstanceOf(NotFoundException.class)
-                .hasMessage(String.format("Пользователь не найден."));
+                .hasMessage("Пользователь не найден.");
 
         Mockito.verify(userRepository, Mockito.times(1)).findById(99L);
         Mockito.verifyNoMoreInteractions(userRepository);
