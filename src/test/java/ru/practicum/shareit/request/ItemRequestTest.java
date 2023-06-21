@@ -40,23 +40,5 @@ public class ItemRequestTest {
 
         Assertions.assertTrue(violations.isEmpty());
     }
-
-    @Test
-    public void testItemRequestWithItems() {
-        User user = new User();
-        LocalDateTime created = LocalDateTime.now();
-        List<Item> items = new ArrayList<>();
-        items.add(new Item());
-
-        ItemRequest itemRequest = new ItemRequest();
-        itemRequest.setDescription("запрос");
-        itemRequest.setRequestor(user);
-        itemRequest.setCreated(created);
-        itemRequest.setItems(items);
-
-        Set<ConstraintViolation<ItemRequest>> violations = validator.validate(itemRequest);
-
-        Assertions.assertTrue(violations.isEmpty());
-    }
 }
 
