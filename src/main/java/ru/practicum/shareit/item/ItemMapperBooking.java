@@ -21,19 +21,5 @@ public interface ItemMapperBooking {
 
         return itemDto;
     }
-
-    static Item toItem(ItemDtoForBooking itemDto, User user) {
-        Item item = new Item();
-        item.setId(itemDto.getId());
-        item.setName(itemDto.getName());
-        item.setDescription(itemDto.getDescription());
-        item.setAvailable(itemDto.getAvailable());
-        item.setRequestId(itemDto.getRequest());
-        item.setComments(itemDto.getComments().stream()
-                .map(dto -> CommentMapper.toComment(dto, user))
-                .collect(Collectors.toList()));
-
-        return item;
-    }
 }
 
