@@ -11,7 +11,9 @@ import ru.practicum.shareit.booking.Enum.StateEnum;
 import ru.practicum.shareit.booking.Enum.StatusEnum;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exceptions.ValidationException;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +24,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = BookingController.class)
+@WebMvcTest(BookingController.class)
 public class BookingControllerTest {
 
     @Autowired
@@ -57,9 +59,9 @@ public class BookingControllerTest {
                         .header("X-Sharer-User-Id", ownerId)
                         .content(objectMapper.writeValueAsString(bookingDto))
                         .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.itemId").value(1L))
                 .andExpect(jsonPath("$.status").value("APPROVED"));
@@ -188,5 +190,37 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$[1].status").value("WAITING"));
 
         verify(bookingService, times(1)).getOwnerBookings(eq(userId), eq(StateEnum.ALL), eq(from), eq(size));
+    }
+
+    @Test
+    public void findBookingUsers_InvalidState_ThrowsValidationException() throws Exception {
+        String invalidState = "UNSUPPORTED_STATUS";
+        Long userId = 123L;
+
+        when(bookingService.findBookingUsers(any(), eq(userId), anyLong(), anyLong()))
+                .thenThrow(new ValidationException("Unknown state: " + invalidState));
+
+        mockMvc.perform(get("/bookings")
+                        .param("state", invalidState)
+                        .header("X-Sharer-User-Id", userId.toString())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json("{\"error\":\"Unknown state: UNSUPPORTED_STATUS\"}"));
+    }
+
+    @Test
+    public void getOwnerBookings_InvalidState_ThrowsValidationException() throws Exception {
+        String invalidState = "UNSUPPORTED_STATUS";
+        Long userId = 123L;
+
+        when(bookingService.getOwnerBookings(eq(userId), any(), anyLong(), anyLong()))
+                .thenThrow(new ValidationException("Unknown state: " + invalidState));
+
+        mockMvc.perform(get("/bookings")
+                        .param("state", invalidState)
+                        .header("X-Sharer-User-Id", userId.toString())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json("{\"error\":\"Unknown state: UNSUPPORTED_STATUS\"}"));
     }
 }

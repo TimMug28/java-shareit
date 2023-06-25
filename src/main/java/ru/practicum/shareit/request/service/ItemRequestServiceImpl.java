@@ -58,9 +58,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         }
         User requestor = userOptional.get();
         List<ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestorOrderByIdDesc(requestor);
-        List<ItemRequestDto> itemRequestDto = itemRequestList.stream()
+        return itemRequestList.stream()
                 .map(ItemRequestMapper::toItemRequestDto).collect(Collectors.toList());
-        return itemRequestDto;
     }
 
     @Override
@@ -83,12 +82,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         int startIndex = from.intValue();
         int endIndex = Math.min(startIndex + size.intValue(), itemRequestList.size());
 
-        List<ItemRequestDto> itemRequestDtoList = itemRequestList.subList(startIndex, endIndex)
+        return itemRequestList.subList(startIndex, endIndex)
                 .stream()
                 .map(ItemRequestMapper::toItemRequestDto)
                 .collect(Collectors.toList());
-
-        return itemRequestDtoList;
     }
 
     @Override

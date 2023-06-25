@@ -116,6 +116,25 @@ class UserServiceImplTest {
         Mockito.verifyNoMoreInteractions(userRepository);
     }
 
+    @Test
+    void updateUser_EmailIfDuplicateTest() {
+        UserDto updatedData = UserDto.builder()
+                .id(1L)
+                .email("user@yandex.ru")
+                .build();
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenReturn(user);
+
+        UserDto returnedUser = userService.updateUser(1L, updatedData);
+
+        Assertions.assertThat(returnedUser.getEmail()).isEqualTo("user@yandex.ru");
+        Assertions.assertThat(returnedUser.getName()).isEqualTo("user");
+
+        Mockito.verify(userRepository, Mockito.times(1)).findById(1L);
+        Mockito.verify(userRepository, Mockito.times(1)).save(user);
+        Mockito.verifyNoMoreInteractions(userRepository);
+    }
 
     @Test
     void updateUserNameTest() {

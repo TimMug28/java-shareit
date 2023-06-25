@@ -1,51 +1,70 @@
 package ru.practicum.shareit.request;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.JsonTest;
+import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.boot.test.json.JsonContent;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
-import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+@JsonTest
 public class ItemRequestMapperTest {
 
-    @Test
-    public void testToItemRequestDto() {
-        ItemRequest itemRequest = new ItemRequest();
-        itemRequest.setId(1L);
-        itemRequest.setDescription("описание");
-
-        User requestor = new User();
-        requestor.setId(1L);
-        requestor.setName("user");
-        itemRequest.setRequestor(requestor);
-
-        LocalDateTime created = LocalDateTime.now();
-        itemRequest.setCreated(created);
-
-        ItemRequestDto itemRequestDto = ItemRequestMapper.toItemRequestDto(itemRequest);
-
-        assertEquals(itemRequest.getId(), itemRequestDto.getId());
-        assertEquals(itemRequest.getDescription(), itemRequestDto.getDescription());
-        assertEquals(itemRequest.getRequestor().getId(), itemRequestDto.getRequestor().getId());
-        assertEquals(itemRequest.getRequestor().getName(), itemRequestDto.getRequestor().getName());
-        assertEquals(itemRequest.getCreated(), itemRequestDto.getCreated());
-    }
+    @Autowired
+    private JacksonTester<ItemRequestDto> json;
 
     @Test
-    public void testToItemRequest() {
+    void testItemRequestDto() throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+
         ItemRequestDto itemRequestDto = new ItemRequestDto();
         itemRequestDto.setId(1L);
         itemRequestDto.setDescription("описание");
+        itemRequestDto.setCreated(now);
+        itemRequestDto.setItems(new ArrayList<>());
 
-        LocalDateTime created = LocalDateTime.now();
+        JsonContent<ItemRequestDto> result = json.write(itemRequestDto);
 
-        ItemRequest itemRequest = ItemRequestMapper.toItemRequest(itemRequestDto, created);
+        Assertions.assertThat(result)
+                .hasJsonPathNumberValue("$.id", 1)
+                .hasJsonPathStringValue("$.created", now)
+                .hasJsonPathStringValue("$.description", "описание")
+                .hasJsonPathArrayValue("$.items", new ArrayList<>());
+    }
 
-        assertEquals(itemRequestDto.getId(), itemRequest.getId());
-        assertEquals(itemRequestDto.getDescription(), itemRequest.getDescription());
-        assertEquals(created, itemRequest.getCreated());
+    @Test
+    void testItemRequestDto_WithItem() throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+
+        Item item = new Item();
+        item.setId(2L);
+        item.setName("вещь");
+        item.setAvailable(true);
+        item.setRequestId(3L);
+
+        ItemRequestDto itemRequestDto = new ItemRequestDto();
+        itemRequestDto.setId(1L);
+        itemRequestDto.setDescription("описание");
+        itemRequestDto.setCreated(now);
+        itemRequestDto.setItems(List.of(item));
+
+
+        JsonContent<ItemRequestDto> result = json.write(itemRequestDto);
+
+        Assertions.assertThat(result)
+                .hasJsonPathNumberValue("$.id", 1)
+                .hasJsonPathStringValue("$.created", now)
+                .hasJsonPathStringValue("$.description", "описание")
+                .hasJsonPathArrayValue("$.items", List.of(item))
+                .hasJsonPathNumberValue("$.items[0].id", 2L)
+                .hasJsonPathStringValue("$.items[0].name", "вещь")
+                .hasJsonPathBooleanValue("$.items[0].available", true)
+                .hasJsonPathNumberValue("$.items[0].requestId", 3L);
     }
 }

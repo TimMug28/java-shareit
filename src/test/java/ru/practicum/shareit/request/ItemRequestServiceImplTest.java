@@ -42,7 +42,7 @@ class ItemRequestServiceImplTest {
     ItemRequest itemRequest;
 
     @BeforeEach
-    void setUp() {
+    void start() {
         itemRequestDto = new ItemRequestDto();
         itemRequestDto.setDescription("описание");
 
@@ -112,7 +112,7 @@ class ItemRequestServiceImplTest {
         List<ItemRequestDto> expected = itemRequestList.stream()
                 .map(ItemRequestMapper::toItemRequestDto)
                 .collect(Collectors.toList());
-        ;
+
         List<ItemRequestDto> result = itemRequestService.getAllItemRequest(1L);
 
         Assertions.assertThat(result)

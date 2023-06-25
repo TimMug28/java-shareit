@@ -33,7 +33,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceImplTest {
@@ -120,8 +120,8 @@ public class ItemServiceImplTest {
 
         Assertions.assertThat(createItem.getRequestId()).isNull();
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(anyLong());
-        Mockito.verify(itemRepository, Mockito.times(1)).save(any(Item.class));
+        verify(userRepository, times(1)).findById(anyLong());
+        verify(itemRepository, times(1)).save(any(Item.class));
         Mockito.verifyNoMoreInteractions(userRepository, itemRepository);
     }
 
@@ -134,7 +134,7 @@ public class ItemServiceImplTest {
         Assertions.assertThat(thrown)
                 .isInstanceOf(NotFoundException.class);
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(99L);
+        verify(userRepository, times(1)).findById(99L);
         Mockito.verifyNoMoreInteractions(userRepository);
         Mockito.verifyNoInteractions(itemRepository, itemRequestRepository);
     }
@@ -156,8 +156,8 @@ public class ItemServiceImplTest {
         Assertions.assertThat(updated.getDescription()).isEqualTo("update description");
         Assertions.assertThat(updated.getAvailable()).isEqualTo(false);
 
-        Mockito.verify(itemRepository, Mockito.times(1)).findById(1L);
-        Mockito.verify(itemRepository, Mockito.times(1)).save(any(Item.class));
+        verify(itemRepository, times(1)).findById(1L);
+        verify(itemRepository, times(1)).save(any(Item.class));
         Mockito.verifyNoMoreInteractions(itemRepository);
     }
 
@@ -176,7 +176,7 @@ public class ItemServiceImplTest {
         Assertions.assertThat(thrown)
                 .isInstanceOf(NotFoundException.class);
 
-        Mockito.verify(itemRepository, Mockito.times(1)).findById(99L);
+        verify(itemRepository, times(1)).findById(99L);
         Mockito.verifyNoMoreInteractions(itemRepository);
     }
 
@@ -236,8 +236,8 @@ public class ItemServiceImplTest {
         Assertions.assertThat(result.getNextBooking()).isNotNull();
         Assertions.assertThat(result.getNextBooking().getId()).isEqualTo(nextBooking.getId());
 
-        Mockito.verify(itemRepository, Mockito.times(1)).findById(itemId);
-        Mockito.verify(userRepository, Mockito.times(1)).findById(ownerId);
+        verify(itemRepository, times(1)).findById(itemId);
+        verify(userRepository, times(1)).findById(ownerId);
         Mockito.verifyNoMoreInteractions(itemRepository, userRepository);
     }
 
@@ -252,7 +252,7 @@ public class ItemServiceImplTest {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage(String.format("Вещь с id %d не найдена.", 99L));
 
-        Mockito.verify(itemRepository, Mockito.times(1)).findById(99L);
+        verify(itemRepository, times(1)).findById(99L);
         Mockito.verifyNoMoreInteractions(itemRepository);
     }
 
@@ -288,8 +288,8 @@ public class ItemServiceImplTest {
         Assertions.assertThat(result.get(1).getId()).isEqualTo(2L);
         Assertions.assertThat(result.get(1).getName()).isEqualTo("утюг");
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(ownerId);
-        Mockito.verify(itemRepository, Mockito.times(1)).findAllByOwnerOrderById(user);
+        verify(userRepository, times(1)).findById(ownerId);
+        verify(itemRepository, times(1)).findAllByOwnerOrderById(user);
         Mockito.verifyNoMoreInteractions(userRepository, itemRepository, bookingItemMapper, commentRepository);
     }
 
@@ -316,7 +316,7 @@ public class ItemServiceImplTest {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Пользователь не найден.");
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(ownerId);
+        verify(userRepository, times(1)).findById(ownerId);
         Mockito.verifyNoMoreInteractions(userRepository);
     }
 
@@ -332,7 +332,7 @@ public class ItemServiceImplTest {
         Assertions.assertThat(itemDtos)
                 .hasSize(1);
 
-        Mockito.verify(itemRepository, Mockito.times(1))
+        verify(itemRepository, times(1))
                 .searchItemsByDescription(text);
         Mockito.verifyNoMoreInteractions(itemRepository);
     }
@@ -358,7 +358,7 @@ public class ItemServiceImplTest {
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result).isEmpty();
 
-        Mockito.verify(itemRepository, Mockito.times(1)).searchItemsByDescription(text);
+        verify(itemRepository, times(1)).searchItemsByDescription(text);
         Mockito.verifyNoMoreInteractions(itemRepository, itemMapper);
     }
 
@@ -401,7 +401,7 @@ public class ItemServiceImplTest {
         assertEquals(1L, result.getId());
         assertEquals(commentDto.getText(), result.getText());
 
-        Mockito.verify(commentRepository, Mockito.times(1)).save(any(Comment.class));
+        verify(commentRepository, times(1)).save(any(Comment.class));
         Mockito.verifyNoMoreInteractions(commentRepository);
     }
 
@@ -432,7 +432,7 @@ public class ItemServiceImplTest {
                 itemService.createComment(commentDto, itemId, userId)
         );
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
+        verify(userRepository, times(1)).findById(userId);
         Mockito.verifyNoMoreInteractions(userRepository, itemRepository, commentRepository);
     }
 
@@ -450,8 +450,8 @@ public class ItemServiceImplTest {
                 itemService.createComment(commentDto, itemId, userId)
         );
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
-        Mockito.verify(itemRepository, Mockito.times(1)).findById(itemId);
+        verify(userRepository, times(1)).findById(userId);
+        verify(itemRepository, times(1)).findById(itemId);
         Mockito.verifyNoMoreInteractions(userRepository, itemRepository, commentRepository);
     }
 
@@ -470,8 +470,8 @@ public class ItemServiceImplTest {
 
         assertThrows(ValidationException.class, () -> itemService.createComment(commentDto, itemId, userId));
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
-        Mockito.verify(itemRepository, Mockito.times(1)).findById(itemId);
+        verify(userRepository, times(1)).findById(userId);
+        verify(itemRepository, times(1)).findById(itemId);
         Mockito.verifyNoMoreInteractions(userRepository, itemRepository, commentRepository);
     }
 }
