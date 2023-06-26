@@ -28,32 +28,27 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public ItemRequestDto createRequest(ItemRequestDto itemRequestDto, Long id) {
         LocalDateTime time = LocalDateTime.now();
         if (id == null || id < 0) {
-            log.info("Пустое поле id.");
             throw new ValidationException("Поле id не может быть пустым.");
         }
         Optional<User> userOptional = userRepository.findById(id);
 
         if (userOptional.isEmpty()) {
-            log.info("Не найден пользователь с id:" + id);
             throw new NotFoundException("Пользователь не найден.");
         }
         validate(itemRequestDto);
         ItemRequest itemRequest = ItemRequestMapper.toItemRequest(itemRequestDto, time);
         itemRequest.setRequestor(userOptional.get());
         ItemRequestDto itemRequestDtoCreated = ItemRequestMapper.toItemRequestDto(itemRequestRepository.save(itemRequest));
-        log.info("Добавлен новый запрос: {}", itemRequestDtoCreated.getId());
         return itemRequestDtoCreated;
     }
 
     @Override
     public List<ItemRequestDto> getAllItemRequest(Long id) {
         if (id == null || id < 0) {
-            log.info("Пустое поле id.");
             throw new ValidationException("Поле id не может быть пустым или отрицательным.");
         }
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
-            log.info("Не найден пользователь с id:" + id);
             throw new NotFoundException("Пользователь не найден.");
         }
         User requestor = userOptional.get();
@@ -65,16 +60,13 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<ItemRequestDto> getAllRequestOtherUsers(Long requesterId, Long from, Long size) {
         if (size == 0 || from < 0 || size < 0) {
-            log.info("Неверный формат from или size.");
             throw new ValidationException("Неверный формат from или size.");
         }
         if (requesterId == null || requesterId < 0) {
-            log.info("Пустое поле id.");
             throw new ValidationException("Поле id не может быть пустым или отрицательным.");
         }
         Optional<User> userOptional = userRepository.findById(requesterId);
         if (userOptional.isEmpty()) {
-            log.info("Не найден пользователь с id:" + requesterId);
             throw new NotFoundException("Пользователь не найден.");
         }
         User requestor = userOptional.get();
@@ -95,12 +87,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         }
         Optional<User> userOptional = userRepository.findById(requesterId);
         if (userOptional.isEmpty()) {
-            log.info("Не найден пользователь с id:" + requesterId);
             throw new NotFoundException("Пользователь не найден.");
         }
         Optional<ItemRequest> itemRequestOptional = itemRequestRepository.findById(requestId);
         if (itemRequestOptional.isEmpty()) {
-            log.info("Не найден запрос с id:" + requesterId);
             throw new NotFoundException("Запрос не найден.");
         }
         ItemRequest itemRequest = itemRequestOptional.get();
@@ -109,7 +99,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     private void validate(ItemRequestDto itemRequest) {
         if (itemRequest.getDescription() == null || itemRequest.getDescription().isBlank()) {
-            log.info("Пустое поле description.");
             throw new ValidationException("Поле description не может быть пустым.");
         }
     }

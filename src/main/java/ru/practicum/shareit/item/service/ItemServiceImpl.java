@@ -39,13 +39,11 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto createItem(ItemDto itemDto, Long owner) {
         Item item = ItemMapper.toItem(itemDto);
         if (owner == null) {
-            log.info("Пустое поле owner.");
             throw new ValidationException("Поле owner не может быть пустым.");
         }
         validate(item);
         Optional<User> getUser = userRepository.findById(owner);
         if (getUser.isEmpty()) {
-            log.info("Не найден пользователь c id={}.", owner);
             throw new NotFoundException("Пользователь не найден.");
         }
         User user = getUser.get();
@@ -53,7 +51,6 @@ public class ItemServiceImpl implements ItemService {
         item.setRequestId(itemDto.getRequestId());
         Item createItem = itemRepository.save(item);
         ItemDto createdItemDto = ItemMapper.toItemDto(createItem);
-        log.info("Добавлена новая вещь: {}", createdItemDto);
         return createdItemDto;
     }
 
@@ -67,7 +64,6 @@ public class ItemServiceImpl implements ItemService {
         }
         Optional<User> owner = userRepository.findById(ownerId);
         if (owner.isEmpty()) {
-            log.info("Не найден пользователь c id={}.", ownerId);
             throw new NotFoundException("Пользователь не найден.");
         }
         Item item = itemOptional.get();
@@ -219,15 +215,12 @@ public class ItemServiceImpl implements ItemService {
 
     private void validate(Item item) {
         if (item.getName() == null || item.getName().isBlank()) {
-            log.info("Пустое поле name.");
             throw new ValidationException("Поле name не может быть пустым.");
         }
         if (item.getDescription() == null || item.getDescription().isBlank()) {
-            log.info("Пустое поле description.");
             throw new ValidationException("Поле description не может быть пустым.");
         }
         if (item.getAvailable() == null) {
-            log.info("Пустое поле available.");
             throw new ValidationException("Поле available не может быть пустым.");
         }
     }

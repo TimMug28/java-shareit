@@ -36,12 +36,10 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto createBooking(BookingDto bookingDto, Long ownerId) {
         if (ownerId == null) {
-            log.info("Пустое поле owner.");
             throw new ValidationException("Поле owner не может быть пустым.");
         }
         Optional<User> userOptional = userRepository.findById(ownerId);
         if (userOptional.isEmpty()) {
-            log.info("Не найден пользователь c id={}.", ownerId);
             throw new NotFoundException("Пользователь не найден.");
         }
         User booker = userOptional.get();
@@ -52,7 +50,6 @@ public class BookingServiceImpl implements BookingService {
         }
         Item item = itemOptional.get();
         if (item.getOwner().equals(booker)) {
-            log.info("Нельзя бронировать свои вещи.");
             throw new NotFoundException("Попытка бронирования своих вещей.");
         }
         if (!item.getAvailable()) {
@@ -69,7 +66,6 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto updateBookingStatus(Long bookingId, boolean approved, Long ownerId) {
         Optional<User> userDb = userRepository.findById(ownerId);
         if (userDb.isEmpty()) {
-            log.info("Не найден пользователь c id={}.", ownerId);
             throw new NotFoundException("Пользователь не найден.");
         }
         Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
@@ -79,11 +75,9 @@ public class BookingServiceImpl implements BookingService {
         }
         Booking oldBooking = bookingOptional.get();
         if (!oldBooking.getItem().getOwner().getId().equals(ownerId)) {
-            log.info("Изменять статус бронирования может только владелец вещи.");
             throw new NotFoundException("Попытка редактирования статуса другим пользователем.");
         }
         if (Objects.equals(StatusEnum.APPROVED, oldBooking.getStatus()) && approved) {
-            log.info("Статус бронирования уже изменён.");
             throw new ValidationException("Попытка изменения статуса бронирования.");
         }
         Booking booking = bookingOptional.get();
@@ -101,11 +95,9 @@ public class BookingServiceImpl implements BookingService {
         Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
         Optional<User> userOptional = userRepository.findById(userId);
         if (bookingOptional.isEmpty()) {
-            log.info("Не найдена бронь с id:" + bookingId);
             throw new NotFoundException("Бронь не найдена.");
         }
         if (userOptional.isEmpty()) {
-            log.info("Не найден пользователь с id:" + bookingId);
             throw new NotFoundException("Пользователь не найден.");
         }
         Booking booking = bookingOptional.get();
@@ -114,7 +106,6 @@ public class BookingServiceImpl implements BookingService {
         if ((ownerId.equals(userId)) || (bookerId.equals(userId))) {
             return BookingMapper.toDto(booking);
         } else {
-            log.info("Получать данные о бронировании может только создатель/владелец вещи.");
             throw new NotFoundException("Попытка получениие данных другим пользователем.");
         }
     }
@@ -122,12 +113,10 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> findBookingUsers(StateEnum state, Long userId, Long from, Long size) {
         if (size == 0 || from < 0 || size < 0) {
-            log.info("Неверный формат from или size.");
             throw new ValidationException("Неверный формат from или size.");
         }
         Optional<User> booker = userRepository.findById(userId);
         if (booker.isEmpty()) {
-            log.info("Не найден пользователь c id={}.", userId);
             throw new NotFoundException("Пользователь не найден.");
         }
         User user = booker.get();
@@ -209,16 +198,13 @@ public class BookingServiceImpl implements BookingService {
 
     private void validateDate(BookingDto bookingDto) {
         if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {
-            log.info("Время начала и окончания бронирования не должны быть пустыми.");
             throw new ValidationException("Время начала и окончания бронирования не должны быть пустыми.");
         }
 
         if (bookingDto.getStart().isEqual(bookingDto.getEnd()) || bookingDto.getStart().isAfter(bookingDto.getEnd())) {
-            log.info("Время начала и окончания бронирования не должны совпадать или быть в обратнром порядке.");
             throw new ValidationException("Время начала и окончания бронирования совпадают.");
         }
         if (bookingDto.getStart().isBefore(LocalDateTime.now().minusSeconds(1))) {
-            log.info("Время начала бронирования не может быть в прошлом.");
             throw new ValidationException("Время начала бронирования не может быть в прошлом.");
         }
     }

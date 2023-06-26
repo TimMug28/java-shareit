@@ -27,9 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceImplTest {
@@ -108,13 +109,13 @@ class BookingServiceImplTest {
         Mockito.when(bookingRepository.save(Mockito.any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         BookingDto createdBookingDto = bookingService.createBooking(bookingDto, 1L);
-        Assertions.assertThat(createdBookingDto).isNotNull();
-        Assertions.assertThat(createdBookingDto.getItemId()).isEqualTo(1L);
-        Assertions.assertThat(createdBookingDto.getStatus()).isEqualTo(StatusEnum.WAITING);
+        assertThat(createdBookingDto).isNotNull();
+        assertThat(createdBookingDto.getItemId()).isEqualTo(1L);
+        assertThat(createdBookingDto.getStatus()).isEqualTo(StatusEnum.WAITING);
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(1L);
-        Mockito.verify(itemRepository, Mockito.times(1)).findById(1L);
-        Mockito.verify(bookingRepository, Mockito.times(1)).save(Mockito.any(Booking.class));
+        verify(userRepository, Mockito.times(1)).findById(1L);
+        verify(itemRepository, Mockito.times(1)).findById(1L);
+        verify(bookingRepository, Mockito.times(1)).save(Mockito.any(Booking.class));
         Mockito.verifyNoMoreInteractions(userRepository, itemRepository, bookingRepository);
     }
 
@@ -125,11 +126,11 @@ class BookingServiceImplTest {
 
         Throwable throwable = Assertions.catchThrowable(() -> bookingService.createBooking(bookingDto, 99L));
 
-        Assertions.assertThat(throwable)
+        assertThat(throwable)
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Пользователь не найден.");
 
-        Mockito.verify(userRepository, times(1)).findById(eq(99L));
+        verify(userRepository, times(1)).findById(eq(99L));
         Mockito.verifyNoMoreInteractions(userRepository);
     }
 
@@ -153,13 +154,13 @@ class BookingServiceImplTest {
 
         BookingDto result = bookingService.updateBookingStatus(bookingId, approved, ownerId);
 
-        Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.getId()).isEqualTo(1L);
-        Assertions.assertThat(result.getStatus()).isEqualTo(StatusEnum.APPROVED);
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getStatus()).isEqualTo(StatusEnum.APPROVED);
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(ownerId);
-        Mockito.verify(bookingRepository, Mockito.times(1)).findById(bookingId);
-        Mockito.verify(bookingRepository, Mockito.times(1)).save(Mockito.any(Booking.class));
+        verify(userRepository, Mockito.times(1)).findById(ownerId);
+        verify(bookingRepository, Mockito.times(1)).findById(bookingId);
+        verify(bookingRepository, Mockito.times(1)).save(Mockito.any(Booking.class));
         Mockito.verifyNoMoreInteractions(userRepository, bookingRepository);
     }
 
@@ -176,7 +177,7 @@ class BookingServiceImplTest {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Пользователь не найден.");
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(ownerId);
+        verify(userRepository, Mockito.times(1)).findById(ownerId);
         Mockito.verifyNoMoreInteractions(userRepository, bookingRepository);
     }
 
@@ -193,8 +194,8 @@ class BookingServiceImplTest {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Бронь с 99 не найдена.");
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(ownerId);
-        Mockito.verify(bookingRepository, Mockito.times(1)).findById(bookingId);
+        verify(userRepository, Mockito.times(1)).findById(ownerId);
+        verify(bookingRepository, Mockito.times(1)).findById(bookingId);
         Mockito.verifyNoMoreInteractions(userRepository, bookingRepository);
     }
 
@@ -211,8 +212,8 @@ class BookingServiceImplTest {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Попытка редактирования статуса другим пользователем.");
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(ownerId);
-        Mockito.verify(bookingRepository, Mockito.times(1)).findById(bookingId);
+        verify(userRepository, Mockito.times(1)).findById(ownerId);
+        verify(bookingRepository, Mockito.times(1)).findById(bookingId);
         Mockito.verifyNoMoreInteractions(userRepository, bookingRepository);
     }
 
@@ -226,11 +227,11 @@ class BookingServiceImplTest {
 
         BookingDto result = bookingService.getBookingDetails(bookingId, userId);
 
-        Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.getId()).isEqualTo(bookingId);
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(bookingId);
 
-        Mockito.verify(bookingRepository, Mockito.times(1)).findById(bookingId);
-        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
+        verify(bookingRepository, Mockito.times(1)).findById(bookingId);
+        verify(userRepository, Mockito.times(1)).findById(userId);
         Mockito.verifyNoMoreInteractions(bookingRepository, userRepository);
     }
 
@@ -246,8 +247,8 @@ class BookingServiceImplTest {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Попытка получениие данных другим пользователем.");
 
-        Mockito.verify(bookingRepository, Mockito.times(1)).findById(bookingId);
-        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
+        verify(bookingRepository, Mockito.times(1)).findById(bookingId);
+        verify(userRepository, Mockito.times(1)).findById(userId);
         Mockito.verifyNoMoreInteractions(bookingRepository, userRepository);
     }
 
@@ -263,8 +264,8 @@ class BookingServiceImplTest {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Бронь не найдена.");
 
-        Mockito.verify(bookingRepository, Mockito.times(1)).findById(bookingId);
-        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
+        verify(bookingRepository, Mockito.times(1)).findById(bookingId);
+        verify(userRepository, Mockito.times(1)).findById(userId);
         Mockito.verifyNoMoreInteractions(bookingRepository, userRepository);
     }
 
@@ -284,12 +285,176 @@ class BookingServiceImplTest {
 
         List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
 
-        Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result).hasSize(2);
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(2);
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
-        Mockito.verify(bookingRepository, Mockito.times(1)).findAllBookingsByBooker(user);
+        verify(userRepository, Mockito.times(1)).findById(userId);
+        verify(bookingRepository, Mockito.times(1)).findAllBookingsByBooker(user);
         Mockito.verifyNoMoreInteractions(userRepository, bookingRepository);
+    }
+
+    @Test
+    public void findBookingUsers_ValidParameters_ReturnsFilteredBookings() {
+        StateEnum state = StateEnum.FUTURE;
+        Long userId = 1L;
+        Long from = 0L;
+        Long size = 10L;
+
+        User user = new User();
+        user.setId(userId);
+
+        LocalDateTime currentDate = LocalDateTime.now();
+
+        List<Booking> bookings = new ArrayList<>();
+        bookings.add(new Booking());
+        bookings.add(new Booking());
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(bookingRepository.findAllByBookerAndStartAfterOrderByStartDesc(user, currentDate)).thenReturn(bookings);
+
+        List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(2);
+
+        verify(userRepository).findById(userId);
+        verify(bookingRepository).findAllByBookerAndStartAfterOrderByStartDesc(user, currentDate);
+    }
+
+    @Test
+    public void findBookingUsers_InvalidSize_ThrowsValidationException() {
+        StateEnum state = StateEnum.ALL;
+        Long userId = 1L;
+        Long from = 0L;
+        Long size = 0L; // Invalid size
+
+        assertThrows(ValidationException.class, () ->
+                bookingService.findBookingUsers(state, userId, from, size));
+
+        verify(userRepository).findById(userId);
+    }
+
+    @Test
+    public void findBookingUsers_UserNotFound_ThrowsNotFoundException() {
+        StateEnum state = StateEnum.ALL;
+        Long userId = 1L;
+        Long from = 0L;
+        Long size = 10L;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () ->
+                bookingService.findBookingUsers(state, userId, from, size));
+
+        verify(userRepository).findById(userId);
+    }
+
+    @Test
+    public void findBookingUsers_CurrentState_ReturnsCurrentBookings() {
+        StateEnum state = StateEnum.CURRENT;
+        Long userId = 1L;
+        Long from = 0L;
+        Long size = 10L;
+
+        User user = new User();
+        user.setId(userId);
+
+        LocalDateTime currentDate = LocalDateTime.now();
+
+        List<Booking> bookings = new ArrayList<>();
+        bookings.add(new Booking());
+        bookings.add(new Booking());
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(bookingRepository.findAllBookingsForBookerWithStartAndEnd(user, currentDate, currentDate)).thenReturn(bookings);
+
+        List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(2);
+
+        verify(userRepository).findById(userId);
+        verify(bookingRepository).findAllBookingsForBookerWithStartAndEnd(user, currentDate, currentDate);
+    }
+
+    @Test
+    public void findBookingUsers_PastState_ReturnsPastBookings() {
+        StateEnum state = StateEnum.PAST;
+        Long userId = 1L;
+        Long from = 0L;
+        Long size = 10L;
+
+        User user = new User();
+        user.setId(userId);
+
+        LocalDateTime currentDate = LocalDateTime.now();
+
+        List<Booking> bookings = new ArrayList<>();
+        bookings.add(new Booking());
+        bookings.add(new Booking());
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(bookingRepository.findAllByBookerAndEndIsBeforeOrderByStartDesc(user, currentDate)).thenReturn(bookings);
+
+        List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(2);
+
+        verify(userRepository).findById(userId);
+        verify(bookingRepository).findAllByBookerAndEndIsBeforeOrderByStartDesc(user, currentDate);
+    }
+
+    @Test
+    public void findBookingUsers_WaitingState_ReturnsWaitingBookings() {
+        StateEnum state = StateEnum.WAITING;
+        Long userId = 1L;
+        Long from = 0L;
+        Long size = 10L;
+
+        User user = new User();
+        user.setId(userId);
+
+        List<Booking> bookings = new ArrayList<>();
+        bookings.add(new Booking());
+        bookings.add(new Booking());
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.WAITING)).thenReturn(bookings);
+
+        List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(2);
+
+        verify(userRepository).findById(userId);
+        verify(bookingRepository).findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.WAITING);
+    }
+
+    @Test
+    public void findBookingUsers_RejectedState_ReturnsRejectedBookings() {
+        StateEnum state = StateEnum.REJECTED;
+        Long userId = 1L;
+        Long from = 0L;
+        Long size = 10L;
+
+        User user = new User();
+        user.setId(userId);
+
+        List<Booking> bookings = new ArrayList<>();
+        bookings.add(new Booking());
+        bookings.add(new Booking());
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED)).thenReturn(bookings);
+
+        List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(2);
+
+        verify(userRepository).findById(userId);
+        verify(bookingRepository).findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED);
     }
 
     @Test
@@ -305,7 +470,7 @@ class BookingServiceImplTest {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Пользователь не найден.");
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
+        verify(userRepository, Mockito.times(1)).findById(userId);
         Mockito.verifyNoMoreInteractions(userRepository, bookingRepository);
     }
 
@@ -339,11 +504,11 @@ class BookingServiceImplTest {
 
         List<BookingDto> result = bookingService.getOwnerBookings(userId, state, from, size);
 
-        Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result).hasSize(2);
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(2);
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
-        Mockito.verify(bookingRepository, Mockito.times(1)).findAllBookingsByItem_Owner(user);
+        verify(userRepository, Mockito.times(1)).findById(userId);
+        verify(bookingRepository, Mockito.times(1)).findAllBookingsByItem_Owner(user);
         Mockito.verifyNoMoreInteractions(userRepository, bookingRepository);
     }
 
@@ -360,7 +525,7 @@ class BookingServiceImplTest {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Пользователь не найден.");
 
-        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
+        verify(userRepository, Mockito.times(1)).findById(userId);
         Mockito.verifyNoMoreInteractions(userRepository, bookingRepository);
     }
 

@@ -21,14 +21,12 @@ public class ItemController {
     @PostMapping
     public ItemDto createItem(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long owner,
                               @RequestBody @Validated ItemDto itemDto) {
-        log.info("POST /items - создание новой вещи.");
         return itemService.createItem(itemDto, owner);
     }
 
     @GetMapping("/{itemId}")
     public ItemDtoForBooking findItemById(@RequestHeader(value = "X-Sharer-User-Id") Long owner,
                                           @PathVariable Long itemId) {
-        log.info("GET /items - запрос вещи по id.");
         return itemService.findItemById(itemId, owner);
     }
 
@@ -36,7 +34,6 @@ public class ItemController {
     public List<ItemDtoForBooking> getAllItems(@RequestHeader("X-Sharer-User-Id") Long owner,
                                                @RequestParam(name = "from", defaultValue = "0") Long from,
                                                @RequestParam(name = "size", defaultValue = "20") Long size) {
-        log.info("GET /items - запрос вещей пользователя " + owner);
         return itemService.getAllItems(owner, from, size);
     }
 
@@ -44,7 +41,6 @@ public class ItemController {
     public ItemDto updateItem(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long owner,
                               @PathVariable Long itemId,
                               @RequestBody ItemDto itemDto) {
-        log.info("PATCH /items - создание изменение вещи.");
         return itemService.updateItem(itemId, owner, itemDto);
     }
 
@@ -54,7 +50,6 @@ public class ItemController {
                                                     @RequestParam(name = "from", defaultValue = "0") Long from,
                                                     @RequestParam(name = "size", defaultValue = "20") Long size
     ) {
-        log.info("GET /items/search?text= " + text);
         return itemService.searchForItemByDescription(text, owner, from, size);
     }
 
@@ -62,7 +57,6 @@ public class ItemController {
     public CommentDto createComment(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId,
                                     @PathVariable Long itemId,
                                     @RequestBody @Validated CommentDto commentDto) {
-        log.info("POST /comment - добавление комментария.");
         return itemService.createComment(commentDto, itemId, userId);
     }
 
