@@ -474,4 +474,103 @@ public class ItemServiceImplTest {
         verify(itemRepository, times(1)).findById(itemId);
         Mockito.verifyNoMoreInteractions(userRepository, itemRepository, commentRepository);
     }
+
+    @Test
+    public void updateItem_NullOwner_ThrowsValidationException() {
+        Long id = 1L;
+        Long owner = null;
+        ItemDto itemDto = new ItemDto();
+
+        assertThrows(ValidationException.class, () -> {
+            itemService.updateItem(id, owner, itemDto);
+        });
+    }
+
+    @Test
+    public void updateItem_ItemNotFound_ThrowsNotFoundException() {
+        Long id = 1L;
+        Long owner = 2L;
+        ItemDto itemDto = new ItemDto();
+
+        when(itemRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> {
+            itemService.updateItem(id, owner, itemDto);
+        });
+    }
+
+    @Test
+    public void updateItem_OwnerMismatch_ThrowsNotFoundException() {
+        Long id = 1L;
+        Long owner = 2L;
+        ItemDto itemDto = new ItemDto();
+        Item item = new Item();
+        User itemOwner = new User();
+        itemOwner.setId(3L);
+        item.setOwner(itemOwner);
+
+        when(itemRepository.findById(id)).thenReturn(Optional.of(item));
+
+        assertThrows(NotFoundException.class, () -> {
+            itemService.updateItem(id, owner, itemDto);
+        });
+    }
+
+    @Test
+    public void validate_NullName_ThrowsValidationException() {
+        Item item = new Item();
+        item.setDescription("Description");
+        item.setAvailable(true);
+
+        assertThrows(ValidationException.class, () -> {
+            itemService.validate(item);
+        });
+    }
+
+    @Test
+    public void validate_BlankName_ThrowsValidationException() {
+        Item item = new Item();
+        item.setName("");
+        item.setDescription("Description");
+        item.setAvailable(true);
+
+        assertThrows(ValidationException.class, () -> {
+            itemService.validate(item);
+        });
+    }
+
+    @Test
+    public void validate_NullDescription_ThrowsValidationException() {
+        Item item = new Item();
+        item.setName("Name");
+        item.setAvailable(true);
+
+        assertThrows(ValidationException.class, () -> {
+            itemService.validate(item);
+        });
+    }
+
+    @Test
+    public void validate_BlankDescription_ThrowsValidationException() {
+        Item item = new Item();
+        item.setName("Name");
+        item.setDescription("");
+        item.setAvailable(true);
+
+        assertThrows(ValidationException.class, () -> {
+            itemService.validate(item);
+        });
+    }
+
+    @Test
+    public void validate_NullAvailable_ThrowsValidationException() {
+        Item item = new Item();
+        item.setName("Name");
+        item.setDescription("Description");
+
+        assertThrows(ValidationException.class, () -> {
+            itemService.validate(item);
+        });
+    }
+
 }

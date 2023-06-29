@@ -289,4 +289,51 @@ class ItemRequestServiceImplTest {
         });
     }
 
+    @Test
+    public void createRequest_NullId_ThrowsValidationException() {
+        ItemRequestDto itemRequestDto = new ItemRequestDto();
+        Long id = null;
+
+        assertThrows(ValidationException.class, () -> {
+            itemRequestService.createRequest(itemRequestDto, id);
+        });
+    }
+
+    @Test
+    public void createRequest_NegativeId_ThrowsValidationException() {
+        ItemRequestDto itemRequestDto = new ItemRequestDto();
+        Long id = -1L;
+
+        assertThrows(ValidationException.class, () -> {
+            itemRequestService.createRequest(itemRequestDto, id);
+        });
+    }
+
+    @Test
+    public void createRequest_UserNotFound_ThrowsNotFoundException() {
+        ItemRequestDto itemRequestDto = new ItemRequestDto();
+        Long id = 1L;
+
+        when(userRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> {
+            itemRequestService.createRequest(itemRequestDto, id);
+        });
+    }
+
+    @Test
+    public void createRequest_InvalidItemRequestDto_ThrowsValidationException() {
+        ItemRequestDto itemRequestDto = new ItemRequestDto();
+        Long id = 1L;
+
+        User user = new User();
+        user.setId(id);
+
+        when(userRepository.findById(id)).thenReturn(Optional.of(user));
+
+        assertThrows(ValidationException.class, () -> {
+            itemRequestService.createRequest(itemRequestDto, id);
+        });
+    }
+
 }

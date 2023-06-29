@@ -213,7 +213,7 @@ public class ItemServiceImpl implements ItemService {
         return commentD;
     }
 
-    private void validate(Item item) {
+    public void validate(Item item) {
         if (item.getName() == null || item.getName().isBlank()) {
             throw new ValidationException("Поле name не может быть пустым.");
         }
