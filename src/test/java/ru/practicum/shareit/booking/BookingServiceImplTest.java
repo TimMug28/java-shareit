@@ -438,6 +438,7 @@ class BookingServiceImplTest {
         verify(userRepository, times(1)).findById(userId);
         verifyNoMoreInteractions(userRepository, bookingRepository);
     }
+
     @Test
     public void findBookingUsers_UserNotFound_ThrowsNotFoundException() {
         StateEnum state = StateEnum.ALL;
