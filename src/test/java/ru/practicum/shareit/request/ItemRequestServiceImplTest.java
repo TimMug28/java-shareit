@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ItemRequestServiceImplTest {
@@ -61,8 +63,8 @@ class ItemRequestServiceImplTest {
 
     @Test
     void createdItemRequestTest() {
-        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(requestor));
-        Mockito.when(itemRequestRepository.save(any(ItemRequest.class))).thenReturn(itemRequest);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(requestor));
+        when(itemRequestRepository.save(any(ItemRequest.class))).thenReturn(itemRequest);
 
         ItemRequestDto mustBe = ItemRequestMapper.toItemRequestDto(itemRequest);
 
@@ -81,7 +83,7 @@ class ItemRequestServiceImplTest {
     @Test
     void createdItemRequestExceptionTest() {
 
-        Mockito.when(userRepository.findById(99L)).thenThrow(new NotFoundException("Пользователь не найден."));
+        when(userRepository.findById(99L)).thenThrow(new NotFoundException("Пользователь не найден."));
 
         Throwable throwable = Assertions.catchException(() -> itemRequestService.createRequest(itemRequestDto, 99L));
 
@@ -106,8 +108,8 @@ class ItemRequestServiceImplTest {
         itemRequestList.add(itemRequest1);
         itemRequestList.add(itemRequest2);
 
-        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(requestor));
-        Mockito.when(itemRequestRepository.findAllByRequestorOrderByIdDesc(requestor)).thenReturn(itemRequestList);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(requestor));
+        when(itemRequestRepository.findAllByRequestorOrderByIdDesc(requestor)).thenReturn(itemRequestList);
 
         List<ItemRequestDto> expected = itemRequestList.stream()
                 .map(ItemRequestMapper::toItemRequestDto)
@@ -127,7 +129,7 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getAllItemRequestNotFoundExceptionTest() {
-        Mockito.when(userRepository.findById(99L)).thenReturn(Optional.empty());
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
         Throwable throwable = Assertions.catchThrowable(() -> itemRequestService.getAllItemRequest(99L));
 
@@ -142,8 +144,8 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getItemRequestByIdTest() {
-        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(requestor));
-        Mockito.when(itemRequestRepository.findById(1L))
+        when(userRepository.findById(1L)).thenReturn(Optional.of(requestor));
+        when(itemRequestRepository.findById(1L))
                 .thenReturn(Optional.of(itemRequest));
 
         ItemRequestDto mustBe = ItemRequestMapper.toItemRequestDto(itemRequest);
@@ -162,7 +164,7 @@ class ItemRequestServiceImplTest {
     @Test
     void getItemRequestByIdNotFoundExceptionTest() {
 
-        Mockito.when(userRepository.findById(99L)).thenThrow(new NotFoundException("Пользователь не найден."));
+        when(userRepository.findById(99L)).thenThrow(new NotFoundException("Пользователь не найден."));
 
         Throwable throwable = Assertions.catchException(() -> itemRequestService.getItemRequestById(99L, 1L));
 
@@ -190,8 +192,8 @@ class ItemRequestServiceImplTest {
         itemRequestList.add(itemRequest1);
         itemRequestList.add(itemRequest2);
 
-        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(requestor));
-        Mockito.when(itemRequestRepository.findAllByRequestorNotOrderByIdDesc(requestor)).thenReturn(itemRequestList);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(requestor));
+        when(itemRequestRepository.findAllByRequestorNotOrderByIdDesc(requestor)).thenReturn(itemRequestList);
 
         List<ItemRequestDto> expectedResult = itemRequestList.stream()
                 .map(ItemRequestMapper::toItemRequestDto)
@@ -225,7 +227,7 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getAllRequestOtherUsersNotFoundExceptionTest() {
-        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         Throwable throwable = Assertions.catchThrowable(() ->
                 itemRequestService.getAllRequestOtherUsers(1L, 0L, 5L)
@@ -238,4 +240,53 @@ class ItemRequestServiceImplTest {
         Mockito.verify(userRepository, Mockito.times(1)).findById(1L);
         Mockito.verifyNoMoreInteractions(userRepository, itemRequestRepository);
     }
+
+    @Test
+    public void getItemRequestById_NullRequesterId_ThrowsValidationException() {
+        Long requesterId = null;
+        Long requestId = 1L;
+
+        assertThrows(ValidationException.class, () -> {
+            itemRequestService.getItemRequestById(requesterId, requestId);
+        });
+    }
+
+    @Test
+    public void getItemRequestById_NullRequestId_ThrowsValidationException() {
+        Long requesterId = 1L;
+        Long requestId = null;
+
+        assertThrows(ValidationException.class, () -> {
+            itemRequestService.getItemRequestById(requesterId, requestId);
+        });
+    }
+
+    @Test
+    public void getItemRequestById_UserNotFound_ThrowsNotFoundException() {
+        Long requesterId = 1L;
+        Long requestId = 1L;
+
+        when(userRepository.findById(requesterId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> {
+            itemRequestService.getItemRequestById(requesterId, requestId);
+        });
+    }
+
+    @Test
+    public void getItemRequestById_ItemRequestNotFound_ThrowsNotFoundException() {
+        Long requesterId = 1L;
+        Long requestId = 1L;
+
+        User user = new User();
+        user.setId(requesterId);
+
+        when(userRepository.findById(requesterId)).thenReturn(Optional.of(user));
+        when(itemRequestRepository.findById(requestId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> {
+            itemRequestService.getItemRequestById(requesterId, requestId);
+        });
+    }
+
 }

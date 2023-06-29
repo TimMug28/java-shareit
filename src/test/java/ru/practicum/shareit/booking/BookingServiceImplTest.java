@@ -5,6 +5,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -28,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -294,46 +295,149 @@ class BookingServiceImplTest {
     }
 
     @Test
-    public void findBookingUsers_ValidParameters_ReturnsFilteredBookings() {
-        StateEnum state = StateEnum.FUTURE;
+    public void findBookingUsers_AllState_ReturnsAllBookingsByBooker() {
+        StateEnum state = StateEnum.ALL;
         Long userId = 1L;
         Long from = 0L;
         Long size = 10L;
 
         User user = new User();
         user.setId(userId);
+        Booking booking1 = new Booking();
+        booking1.setId(1L);
+        booking1.setBooker(user);
+        Booking booking2 = new Booking();
+        booking2.setId(2L);
+        booking2.setBooker(user);
+        Item item1 = new Item();
+        item1.setId(10L);
+        booking1.setItem(item1);
 
-        LocalDateTime currentDate = LocalDateTime.now();
+        Item item2 = new Item();
+        item2.setId(20L);
+        booking2.setItem(item2);
 
-        List<Booking> bookings = new ArrayList<>();
-        bookings.add(new Booking());
-        bookings.add(new Booking());
+        List<Booking> bookings = List.of(booking1, booking2);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(bookingRepository.findAllByBookerAndStartAfterOrderByStartDesc(user, currentDate)).thenReturn(bookings);
+        when(bookingRepository.findAllBookingsByBooker(user)).thenReturn(bookings);
 
         List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
 
-        assertThat(result).isNotNull();
-        assertThat(result).hasSize(2);
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals(1L, result.get(0).getId());
+        assertEquals(2L, result.get(1).getId());
+        assertEquals(10L, result.get(0).getItem().getId());
+        assertEquals(20L, result.get(1).getItem().getId());
 
-        verify(userRepository).findById(userId);
-        verify(bookingRepository).findAllByBookerAndStartAfterOrderByStartDesc(user, currentDate);
+        verify(userRepository, times(1)).findById(userId);
+        verify(bookingRepository, times(1)).findAllBookingsByBooker(user);
+        verifyNoMoreInteractions(userRepository, bookingRepository);
     }
 
     @Test
-    public void findBookingUsers_InvalidSize_ThrowsValidationException() {
+    public void findBookingUsers_WaitingState_ReturnsWaitingBookingsByBooker() {
+        StateEnum state = StateEnum.WAITING;
+        Long userId = 1L;
+        Long from = 0L;
+        Long size = 10L;
+
+        User user = new User();
+        user.setId(userId);
+        Booking booking1 = new Booking();
+        booking1.setId(1L);
+        booking1.setStatus(StatusEnum.WAITING);
+        booking1.setBooker(user);
+        Booking booking2 = new Booking();
+        booking2.setId(2L);
+        booking2.setStatus(StatusEnum.WAITING);
+        booking2.setBooker(user);
+        Item item1 = new Item();
+        item1.setId(10L);
+        booking1.setItem(item1);
+
+        Item item2 = new Item();
+        item2.setId(20L);
+        booking2.setItem(item2);
+
+        List<Booking> bookings = List.of(booking1, booking2);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.WAITING)).thenReturn(bookings);
+
+        List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals(1L, result.get(0).getId());
+        assertEquals(2L, result.get(1).getId());
+        assertEquals(10L, result.get(0).getItem().getId());
+        assertEquals(20L, result.get(1).getItem().getId());
+
+        verify(userRepository, times(1)).findById(userId);
+        verify(bookingRepository, times(1)).findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.WAITING);
+        verifyNoMoreInteractions(userRepository, bookingRepository);
+    }
+
+    @Test
+    public void findBookingUsers_RejectedState_ReturnsRejectedBookingsByBooker() {
+        StateEnum state = StateEnum.REJECTED;
+        Long userId = 1L;
+        Long from = 0L;
+        Long size = 10L;
+
+        User user = new User();
+        user.setId(userId);
+        Booking booking1 = new Booking();
+        booking1.setId(1L);
+        booking1.setStatus(StatusEnum.REJECTED);
+        booking1.setBooker(user);
+        Booking booking2 = new Booking();
+        booking2.setId(2L);
+        booking2.setStatus(StatusEnum.REJECTED);
+        booking2.setBooker(user);
+        Item item1 = new Item();
+        item1.setId(10L);
+        booking1.setItem(item1);
+
+        Item item2 = new Item();
+        item2.setId(20L);
+        booking2.setItem(item2);
+
+        List<Booking> bookings = List.of(booking1, booking2);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED)).thenReturn(bookings);
+
+        List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals(1L, result.get(0).getId());
+        assertEquals(2L, result.get(1).getId());
+        assertEquals(10L, result.get(0).getItem().getId());
+        assertEquals(20L, result.get(1).getItem().getId());
+
+        verify(userRepository, times(1)).findById(userId);
+        verify(bookingRepository, times(1)).findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED);
+        verifyNoMoreInteractions(userRepository, bookingRepository);
+    }
+
+    @Test
+    public void findBookingUsers_InvalidUserId_ThrowsNotFoundException() {
         StateEnum state = StateEnum.ALL;
         Long userId = 1L;
         Long from = 0L;
-        Long size = 0L; // Invalid size
+        Long size = 10L;
 
-        assertThrows(ValidationException.class, () ->
-                bookingService.findBookingUsers(state, userId, from, size));
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        verify(userRepository).findById(userId);
+        assertThrows(NotFoundException.class, () -> bookingService.findBookingUsers(state, userId, from, size));
+
+        verify(userRepository, times(1)).findById(userId);
+        verifyNoMoreInteractions(userRepository, bookingRepository);
     }
-
     @Test
     public void findBookingUsers_UserNotFound_ThrowsNotFoundException() {
         StateEnum state = StateEnum.ALL;
@@ -349,113 +453,7 @@ class BookingServiceImplTest {
         verify(userRepository).findById(userId);
     }
 
-    @Test
-    public void findBookingUsers_CurrentState_ReturnsCurrentBookings() {
-        StateEnum state = StateEnum.CURRENT;
-        Long userId = 1L;
-        Long from = 0L;
-        Long size = 10L;
 
-        User user = new User();
-        user.setId(userId);
-
-        LocalDateTime currentDate = LocalDateTime.now();
-
-        List<Booking> bookings = new ArrayList<>();
-        bookings.add(new Booking());
-        bookings.add(new Booking());
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(bookingRepository.findAllBookingsForBookerWithStartAndEnd(user, currentDate, currentDate)).thenReturn(bookings);
-
-        List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
-
-        assertThat(result).isNotNull();
-        assertThat(result).hasSize(2);
-
-        verify(userRepository).findById(userId);
-        verify(bookingRepository).findAllBookingsForBookerWithStartAndEnd(user, currentDate, currentDate);
-    }
-
-    @Test
-    public void findBookingUsers_PastState_ReturnsPastBookings() {
-        StateEnum state = StateEnum.PAST;
-        Long userId = 1L;
-        Long from = 0L;
-        Long size = 10L;
-
-        User user = new User();
-        user.setId(userId);
-
-        LocalDateTime currentDate = LocalDateTime.now();
-
-        List<Booking> bookings = new ArrayList<>();
-        bookings.add(new Booking());
-        bookings.add(new Booking());
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(bookingRepository.findAllByBookerAndEndIsBeforeOrderByStartDesc(user, currentDate)).thenReturn(bookings);
-
-        List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
-
-        assertThat(result).isNotNull();
-        assertThat(result).hasSize(2);
-
-        verify(userRepository).findById(userId);
-        verify(bookingRepository).findAllByBookerAndEndIsBeforeOrderByStartDesc(user, currentDate);
-    }
-
-    @Test
-    public void findBookingUsers_WaitingState_ReturnsWaitingBookings() {
-        StateEnum state = StateEnum.WAITING;
-        Long userId = 1L;
-        Long from = 0L;
-        Long size = 10L;
-
-        User user = new User();
-        user.setId(userId);
-
-        List<Booking> bookings = new ArrayList<>();
-        bookings.add(new Booking());
-        bookings.add(new Booking());
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.WAITING)).thenReturn(bookings);
-
-        List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
-
-        assertThat(result).isNotNull();
-        assertThat(result).hasSize(2);
-
-        verify(userRepository).findById(userId);
-        verify(bookingRepository).findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.WAITING);
-    }
-
-    @Test
-    public void findBookingUsers_RejectedState_ReturnsRejectedBookings() {
-        StateEnum state = StateEnum.REJECTED;
-        Long userId = 1L;
-        Long from = 0L;
-        Long size = 10L;
-
-        User user = new User();
-        user.setId(userId);
-
-        List<Booking> bookings = new ArrayList<>();
-        bookings.add(new Booking());
-        bookings.add(new Booking());
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED)).thenReturn(bookings);
-
-        List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
-
-        assertThat(result).isNotNull();
-        assertThat(result).hasSize(2);
-
-        verify(userRepository).findById(userId);
-        verify(bookingRepository).findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED);
-    }
 
     @Test
     void findBookingUsersInvalidUserTest() {
@@ -541,6 +539,66 @@ class BookingServiceImplTest {
                 .hasMessage("Неверный формат from или size.");
 
         Mockito.verifyNoInteractions(userRepository, bookingRepository);
+    }
+
+    @Test
+    public void createBooking_NullOwnerId_ThrowsValidationException() {
+        BookingDto bookingDto = new BookingDto();
+        Long ownerId = null;
+
+        assertThrows(ValidationException.class, () -> {
+            bookingService.createBooking(bookingDto, ownerId);
+        });
+    }
+
+    @Test
+    public void createBooking_NonexistentUser_ThrowsNotFoundException() {
+        BookingDto bookingDto = new BookingDto();
+        Long ownerId = 1L;
+
+        when(userRepository.findById(ownerId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> {
+            bookingService.createBooking(bookingDto, ownerId);
+        });
+    }
+
+    @Test
+    public void createBooking_NonexistentItem_ThrowsNotFoundException() {
+        BookingDto bookingDto = new BookingDto();
+        Long ownerId = 1L;
+
+        User owner = new User();
+        owner.setId(ownerId);
+
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
+        when(itemRepository.findById(ArgumentMatchers.any())).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> {
+            bookingService.createBooking(bookingDto, ownerId);
+        });
+    }
+
+
+    @Test
+    public void createBooking_BookingOwnItem_ThrowsNotFoundException() {
+        BookingDto bookingDto = new BookingDto();
+        Long ownerId = 1L;
+        Long itemId = 1L;
+
+        User owner = new User();
+        owner.setId(ownerId);
+
+        Item item = new Item();
+        item.setId(itemId);
+        item.setOwner(owner);
+
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
+        when(itemRepository.findById(ArgumentMatchers.any())).thenReturn(Optional.of(item));
+
+        assertThrows(NotFoundException.class, () -> {
+            bookingService.createBooking(bookingDto, ownerId);
+        });
     }
 }
 
