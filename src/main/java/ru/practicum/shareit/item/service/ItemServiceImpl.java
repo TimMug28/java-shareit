@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingItemMapper;
 import ru.practicum.shareit.booking.Enum.StatusEnum;
@@ -119,7 +120,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoForBooking> getAllItems(Long ownerId, Long from, Long size) {
+    public List<ItemDtoForBooking> getAllItems(Long ownerId, int from, int size) {
         if (size == 0 || from < 0 || size < 0) {
             log.info("Неверный формат from или size.");
             throw new ValidationException("Неверный формат from или size.");
@@ -129,10 +130,10 @@ public class ItemServiceImpl implements ItemService {
             log.info("Не найден пользователь c id={}.", ownerId);
             throw new NotFoundException("Пользователь не найден.");
         }
-        List<Item> items = itemRepository.findAllByOwnerOrderById(userOptional.get());
-        int startIndex = from.intValue();
-        int endIndex = Math.min(startIndex + size.intValue(), items.size());
-        List<Item> paginatedItems = items.subList(startIndex, endIndex);
+        int page = from / size;
+        PageRequest pageRequest = PageRequest.of(page, size);
+        List<Item> paginatedItems = itemRepository.findAllByOwnerOrderById(userOptional.get(), pageRequest);
+
         List<ItemDtoForBooking> itemDtoForBookingSet = new ArrayList<>();
         LocalDateTime localDateTime = LocalDateTime.now();
         for (Item item : paginatedItems) {
@@ -155,18 +156,19 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchForItemByDescription(String text, Long owner, Long from, Long size) {
+    public List<ItemDto> searchForItemByDescription(String text, Long owner, int from, int size) {
         if (size == 0 || from < 0 || size < 0) {
             log.info("Неверный формат from или size.");
             throw new ValidationException("Неверный формат from или size.");
         }
         String description = text.toLowerCase();
-        List<Item> itemList = itemRepository.searchItemsByDescription(text);
+        int page = from / size;
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        List<Item> itemList = itemRepository.searchItemsByDescription(text, pageRequest);
         log.info("Запрошены вещи по ключевому слову={}.", description);
-        int startIndex = from.intValue();
-        int endIndex = Math.min(startIndex + size.intValue(), itemList.size());
-        List<Item> paginatedItemList = itemList.subList(startIndex, endIndex);
-        return paginatedItemList
+
+        return itemList
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .filter(ItemDto::getAvailable)

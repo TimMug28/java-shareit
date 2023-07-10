@@ -40,8 +40,8 @@ public class BookingController {
     @GetMapping
     public List<BookingDto> findBookingUsers(@RequestParam(value = "state", defaultValue = "ALL") String state,
                                              @RequestHeader(value = "X-Sharer-User-Id") Long userId,
-                                             @RequestParam(name = "from", defaultValue = "0") Long from,
-                                             @RequestParam(name = "size", defaultValue = "20") Long size) {
+                                             @RequestParam(name = "from", defaultValue = "0") int from,
+                                             @RequestParam(name = "size", defaultValue = "20") int size) {
         try {
             StateEnum status = StateEnum.valueOf(state);
             return bookingService.findBookingUsers(status, userId, from, size);
@@ -53,8 +53,8 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingDto> getOwnerBookings(@RequestParam(value = "state", defaultValue = "ALL") String state,
                                              @RequestHeader(value = "X-Sharer-User-Id") Long userId,
-                                             @RequestParam(name = "from", defaultValue = "0") Long from,
-                                             @RequestParam(name = "size", defaultValue = "20") Long size) {
+                                             @RequestParam(name = "from", defaultValue = "0") int from,
+                                             @RequestParam(name = "size", defaultValue = "20") int size) {
         try {
             StateEnum status = StateEnum.valueOf(state);
             return bookingService.getOwnerBookings(userId, status, from, size);

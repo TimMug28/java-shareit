@@ -21,7 +21,6 @@ public class ValidateUtilTest {
         String message = "ID must not be null";
 
         ValidateUtil.validNumberNotNull(1L, message);
-        // No exception is thrown
     }
 
     @Test

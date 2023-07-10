@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.booking.BookingItemMapper;
 import ru.practicum.shareit.booking.Enum.StatusEnum;
 import ru.practicum.shareit.booking.dto.BookingDtoItem;
@@ -259,8 +260,8 @@ public class ItemServiceImplTest {
     @Test
     void getAllItemsTest() {
         ownerId = 1L;
-        Long from = 0L;
-        Long size = 10L;
+        int from = 0;
+        int size = 10;
 
         List<Item> items = new ArrayList<>();
         items.add(item);
@@ -277,7 +278,10 @@ public class ItemServiceImplTest {
         item.setComments(comments);
         item2.setComments(comments2);
         when(userRepository.findById(ownerId)).thenReturn(Optional.of(user));
-        when(itemRepository.findAllByOwnerOrderById(user)).thenReturn(items);
+        int page = from / size;
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        when(itemRepository.findAllByOwnerOrderById(user, pageRequest)).thenReturn(items);
 
         List<ItemDtoForBooking> result = itemService.getAllItems(ownerId, from, size);
 
@@ -289,15 +293,15 @@ public class ItemServiceImplTest {
         Assertions.assertThat(result.get(1).getName()).isEqualTo("утюг");
 
         verify(userRepository, times(1)).findById(ownerId);
-        verify(itemRepository, times(1)).findAllByOwnerOrderById(user);
+        verify(itemRepository, times(1)).findAllByOwnerOrderById(user, pageRequest);
         Mockito.verifyNoMoreInteractions(userRepository, itemRepository, bookingItemMapper, commentRepository);
     }
 
     @Test
     void getAllItemsValidationExceptionTest() {
         ownerId = 1L;
-        Long from = -1L;
-        Long size = 0L;
+        int from = -1;
+        int size = 0;
 
         Assertions.assertThatThrownBy(() -> itemService.getAllItems(ownerId, from, size))
                 .isInstanceOf(ValidationException.class)
@@ -312,7 +316,7 @@ public class ItemServiceImplTest {
 
         when(userRepository.findById(ownerId)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> itemService.getAllItems(ownerId, 0L, 10L))
+        Assertions.assertThatThrownBy(() -> itemService.getAllItems(ownerId, 0, 10))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Пользователь не найден.");
 
@@ -325,21 +329,23 @@ public class ItemServiceImplTest {
         item2.setAvailable(true);
         List<Item> items = List.of(item2);
         String text = "утюг";
-        when(itemRepository.searchItemsByDescription(text)).thenReturn(items);
+        int page = 0 / 10;
+        PageRequest pageRequest = PageRequest.of(page, 10);
+        when(itemRepository.searchItemsByDescription(text, pageRequest)).thenReturn(items);
 
-        List<ItemDto> itemDtos = itemService.searchForItemByDescription(text, 1L, 0L, 5L);
+        List<ItemDto> itemDtos = itemService.searchForItemByDescription(text, 1L, 0, 10);
 
         Assertions.assertThat(itemDtos)
                 .hasSize(1);
 
         verify(itemRepository, times(1))
-                .searchItemsByDescription(text);
+                .searchItemsByDescription(text, pageRequest);
         Mockito.verifyNoMoreInteractions(itemRepository);
     }
 
     @Test
     void searchForItemByDescriptionValidationExceptionTest() {
-        Assertions.assertThatThrownBy(() -> itemService.searchForItemByDescription("дрель", 1L, -1L, 10L))
+        Assertions.assertThatThrownBy(() -> itemService.searchForItemByDescription("дрель", 1L, -1, 10))
                 .isInstanceOf(ValidationException.class);
 
         Mockito.verifyNoInteractions(itemRepository, itemMapper);
@@ -351,14 +357,17 @@ public class ItemServiceImplTest {
 
         List<Item> items = new ArrayList<>();
 
-        when(itemRepository.searchItemsByDescription(text)).thenReturn(items);
+        int page = 0 / 10;
 
-        List<ItemDto> result = itemService.searchForItemByDescription(text, 1L, 0L, 10L);
+        PageRequest pageRequest = PageRequest.of(page, 10);
+        when(itemRepository.searchItemsByDescription(text, pageRequest)).thenReturn(items);
+
+        List<ItemDto> result = itemService.searchForItemByDescription(text, 1L, 0, 10);
 
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result).isEmpty();
 
-        verify(itemRepository, times(1)).searchItemsByDescription(text);
+        verify(itemRepository, times(1)).searchItemsByDescription(text, pageRequest);
         Mockito.verifyNoMoreInteractions(itemRepository, itemMapper);
     }
 

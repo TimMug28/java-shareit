@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -36,22 +37,38 @@ public class BookingControllerTest {
     @MockBean
     private BookingService bookingService;
 
-    @Test
-    public void createBookingTest() throws Exception {
-        Long ownerId = 1L;
+    private BookingDto bookingDto;
+    private BookingDto createdBookingDto;
+    private Long ownerId;
+    private Long bookingId;
+    private Long userId;
+    private int from;
+    private int size;
 
-        BookingDto bookingDto = new BookingDto();
+    @BeforeEach
+    void start(){
+        bookingId = 1L;
+        ownerId = 1L;
+        userId = 1L;
+        from = 0;
+        size = 10;
+
+        bookingDto = new BookingDto();
         bookingDto.setItemId(1L);
         bookingDto.setStart(LocalDateTime.of(2023,10,5,16,23));
         bookingDto.setEnd(LocalDateTime.of(2023,10,5,16,23).plusHours(1));
         bookingDto.setStatus(StatusEnum.APPROVED);
 
-        BookingDto createdBookingDto = new BookingDto();
+        createdBookingDto = new BookingDto();
         createdBookingDto.setId(1L);
         createdBookingDto.setItemId(1L);
         createdBookingDto.setStart(LocalDateTime.of(2023,10,5,16,23));
         createdBookingDto.setEnd(LocalDateTime.of(2023,10,5,16,23).plusHours(1));
         createdBookingDto.setStatus(StatusEnum.APPROVED);
+    }
+
+    @Test
+    public void createBookingTest() throws Exception {
 
         when(bookingService.createBooking(any(BookingDto.class), anyLong()))
                 .thenReturn(createdBookingDto);
@@ -69,9 +86,7 @@ public class BookingControllerTest {
 
     @Test
     public void updateBookingStatusTest() throws Exception {
-        Long bookingId = 1L;
         boolean approved = true;
-        Long ownerId = 1L;
 
         BookingDto updatedBookingDto = new BookingDto();
         updatedBookingDto.setId(bookingId);
@@ -92,10 +107,7 @@ public class BookingControllerTest {
 
     @Test
     public void getBookingDetailsTest() throws Exception {
-        Long bookingId = 1L;
-        Long userId = 1L;
 
-        BookingDto bookingDto = new BookingDto();
         bookingDto.setId(bookingId);
         bookingDto.setItemId(1L);
         bookingDto.setStart(LocalDateTime.of(2023,10,5,16,23));
@@ -117,9 +129,6 @@ public class BookingControllerTest {
     @Test
     public void findBookingUsersTest() throws Exception {
         String state = "ALL";
-        Long userId = 1L;
-        Long from = 0L;
-        Long size = 10L;
 
         BookingDto bookingDto1 = new BookingDto();
         bookingDto1.setId(1L);
@@ -141,8 +150,8 @@ public class BookingControllerTest {
         mockMvc.perform(get("/bookings")
                         .param("state", state)
                         .header("X-Sharer-User-Id", userId)
-                        .param("from", from.toString())
-                        .param("size", size.toString()))
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value(1L))
@@ -156,9 +165,6 @@ public class BookingControllerTest {
     @Test
     public void getOwnerBookingsTest() throws Exception {
         String state = "ALL";
-        Long userId = 1L;
-        Long from = 0L;
-        Long size = 10L;
 
         BookingDto bookingDto1 = new BookingDto();
         bookingDto1.setId(1L);
@@ -180,8 +186,8 @@ public class BookingControllerTest {
         mockMvc.perform(get("/bookings/owner")
                         .param("state", state)
                         .header("X-Sharer-User-Id", userId)
-                        .param("from", from.toString())
-                        .param("size", size.toString()))
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value(1L))
@@ -197,7 +203,7 @@ public class BookingControllerTest {
         String invalidState = "UNSUPPORTED_STATUS";
         Long userId = 123L;
 
-        when(bookingService.findBookingUsers(any(), eq(userId), anyLong(), anyLong()))
+        when(bookingService.findBookingUsers(any(), eq(userId), anyInt(), anyInt()))
                 .thenThrow(new ValidationException("Unknown state: " + invalidState));
 
         mockMvc.perform(get("/bookings")
@@ -213,7 +219,7 @@ public class BookingControllerTest {
         String invalidState = "UNSUPPORTED_STATUS";
         Long userId = 123L;
 
-        when(bookingService.getOwnerBookings(eq(userId), any(), anyLong(), anyLong()))
+        when(bookingService.getOwnerBookings(eq(userId), any(), anyInt(), anyInt()))
                 .thenThrow(new ValidationException("Unknown state: " + invalidState));
 
         mockMvc.perform(get("/bookings")

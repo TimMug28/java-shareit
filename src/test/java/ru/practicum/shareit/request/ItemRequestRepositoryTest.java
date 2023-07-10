@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
@@ -58,7 +59,9 @@ class ItemRequestRepositoryTest {
 
     @Test
     void testFindAllByRequestorNotOrderByIdDesc() {
-        List<ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestorNotOrderByIdDesc(user);
+        int page = 0 / 5;
+        PageRequest pageRequest = PageRequest.of(page, 5);
+        List<ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestorNotOrderByIdDesc(user, pageRequest);
 
         assertNotNull(itemRequestList);
         assertEquals(0, itemRequestList.size());

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.booking.Enum.StatusEnum;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -32,11 +33,14 @@ class BookingRepositoryTest {
     Booking booking1;
     Booking booking2;
     Booking booking3;
-
     LocalDateTime startDate;
+    PageRequest pageRequest;
 
     @BeforeEach
     void start() {
+        int page = 0 / 10;
+        pageRequest = PageRequest.of(page, 10);
+
         booker = User.builder()
                 .name("booker")
                 .email("booker@yandex.ru")
@@ -88,7 +92,7 @@ class BookingRepositoryTest {
 
     @Test
     void testFindAllBookingsByBooker() {
-        List<Booking> bookingList = bookingRepository.findAllBookingsByBooker(booker);
+        List<Booking> bookingList = bookingRepository.findAllBookingsByBooker(booker, pageRequest);
 
         assertNotNull(bookingList);
         assertEquals(3, bookingList.size());
@@ -98,7 +102,7 @@ class BookingRepositoryTest {
 
     @Test
     void testFindAllByBookerAndStartAfterOrderByStartDesc() {
-        List<Booking> bookings = bookingRepository.findAllByBookerAndStartAfterOrderByStartDesc(booker, startDate);
+        List<Booking> bookings = bookingRepository.findAllByBookerAndStartAfterOrderByStartDesc(booker, startDate, pageRequest);
 
         assertNotNull(bookings);
         assertEquals(2, bookings.size());
@@ -108,7 +112,7 @@ class BookingRepositoryTest {
 
     @Test
     void testFindAllByBookerAndStatusEqualsOrderByStartDesc() {
-        List<Booking> bookings = bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(booker, StatusEnum.APPROVED);
+        List<Booking> bookings = bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(booker, StatusEnum.APPROVED, pageRequest);
 
         assertNotNull(bookings);
         assertEquals(2, bookings.size());
@@ -144,7 +148,7 @@ class BookingRepositoryTest {
                 .build();
         bookingRepository.save(booking3);
 
-        List<Booking> bookings = bookingRepository.findAllByBookerAndEndIsBeforeOrderByStartDesc(booker, endDate);
+        List<Booking> bookings = bookingRepository.findAllByBookerAndEndIsBeforeOrderByStartDesc(booker, endDate, pageRequest);
 
         assertNotNull(bookings);
         assertEquals(2, bookings.size());
@@ -153,7 +157,7 @@ class BookingRepositoryTest {
 
     @Test
     void testFindAllBookingsByItemOwner() {
-        List<Booking> bookings = bookingRepository.findAllBookingsByItem_Owner(owner);
+        List<Booking> bookings = bookingRepository.findAllBookingsByItem_Owner(owner, pageRequest);
 
         assertNotNull(bookings);
         assertEquals(2, bookings.size());
@@ -165,7 +169,7 @@ class BookingRepositoryTest {
     void testFindAllByItem_OwnerAndStartIsAfterOrderByStartDesc() {
         LocalDateTime localDateTime = LocalDateTime.now().minusHours(1);
 
-        List<Booking> bookingList = bookingRepository.findAllByItem_OwnerAndStartIsAfterOrderByStartDesc(owner, localDateTime);
+        List<Booking> bookingList = bookingRepository.findAllByItem_OwnerAndStartIsAfterOrderByStartDesc(owner, localDateTime, pageRequest);
 
         assertNotNull(bookingList);
         assertEquals(1, bookingList.size());
@@ -177,7 +181,7 @@ class BookingRepositoryTest {
         LocalDateTime startDateTime = LocalDateTime.now().minusDays(2);
         LocalDateTime endDateTime = LocalDateTime.now().minusDays(1);
 
-        List<Booking> bookingList = bookingRepository.findAllBookingsForBookerWithStartAndEnd(booker, startDateTime, endDateTime);
+        List<Booking> bookingList = bookingRepository.findAllBookingsForBookerWithStartAndEnd(booker, startDateTime, endDateTime, pageRequest);
 
         assertNotNull(bookingList);
         assertEquals(0, bookingList.size());
@@ -187,7 +191,7 @@ class BookingRepositoryTest {
     void testFindAllByItem_OwnerAndStatusEqualsOrderByStartDesc() {
         booking2.setStatus(StatusEnum.CANCELED);
 
-        List<Booking> bookingList = bookingRepository.findAllByItem_OwnerAndStatusEqualsOrderByStartDesc(owner, StatusEnum.APPROVED);
+        List<Booking> bookingList = bookingRepository.findAllByItem_OwnerAndStatusEqualsOrderByStartDesc(owner, StatusEnum.APPROVED, pageRequest);
 
         assertNotNull(bookingList);
         assertEquals(1, bookingList.size());
@@ -197,7 +201,7 @@ class BookingRepositoryTest {
     @Test
     void testFindAllByItem_OwnerAndEndIsBeforeOrderByStartDesc() {
         LocalDateTime endDate = LocalDateTime.now();
-        List<Booking> bookings = bookingRepository.findAllByItem_OwnerAndEndIsBeforeOrderByStartDesc(owner, endDate);
+        List<Booking> bookings = bookingRepository.findAllByItem_OwnerAndEndIsBeforeOrderByStartDesc(owner, endDate, pageRequest);
 
         assertNotNull(bookings);
         assertEquals(1, bookings.size());
@@ -210,7 +214,7 @@ class BookingRepositoryTest {
         LocalDateTime localDateTime1 = LocalDateTime.now().minusHours(2);
         LocalDateTime localDateTime2 = LocalDateTime.now().plusHours(2);
 
-        List<Booking> bookingList = bookingRepository.findAllByItem_OwnerAndStartBeforeAndEndAfterOrderByStartDesc(owner, localDateTime2, localDateTime1);
+        List<Booking> bookingList = bookingRepository.findAllByItem_OwnerAndStartBeforeAndEndAfterOrderByStartDesc(owner, localDateTime2, localDateTime1, pageRequest);
 
         assertNotNull(bookingList);
         assertEquals(2, bookingList.size());

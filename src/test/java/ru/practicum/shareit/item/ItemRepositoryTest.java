@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -50,7 +51,9 @@ class ItemRepositoryTest {
 
     @Test
     void testFindAllByOwnerOrderById() {
-        List<Item> itemList = itemRepository.findAllByOwnerOrderById(user);
+        int page = 0 / 5;
+        PageRequest pageRequest = PageRequest.of(page, 5);
+        List<Item> itemList = itemRepository.findAllByOwnerOrderById(user, pageRequest);
 
         assertNotNull(itemList);
         assertEquals(2, itemList.size());
@@ -58,7 +61,9 @@ class ItemRepositoryTest {
 
     @Test
     void testSearchItemsByText() {
-        List<Item> itemList = itemRepository.searchItemsByDescription("просто");
+        int page = 0 / 5;
+        PageRequest pageRequest = PageRequest.of(page, 5);
+        List<Item> itemList = itemRepository.searchItemsByDescription("просто", pageRequest);
         assertNotNull(itemList);
         assertEquals(1, itemList.size());
     }

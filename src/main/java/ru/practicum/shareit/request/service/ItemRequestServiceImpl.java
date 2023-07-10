@@ -2,6 +2,7 @@ package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
@@ -58,7 +59,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDto> getAllRequestOtherUsers(Long requesterId, Long from, Long size) {
+    public List<ItemRequestDto> getAllRequestOtherUsers(Long requesterId, int from, int size) {
         if (size == 0 || from < 0 || size < 0) {
             throw new ValidationException("Неверный формат from или size.");
         }
@@ -70,11 +71,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             throw new NotFoundException("Пользователь не найден.");
         }
         User requestor = userOptional.get();
-        List<ItemRequest> itemRequestList = itemRequestRepository.findAllByRequestorNotOrderByIdDesc(requestor);
-        int startIndex = from.intValue();
-        int endIndex = Math.min(startIndex + size.intValue(), itemRequestList.size());
-
-        return itemRequestList.subList(startIndex, endIndex)
+        int page = from / size;
+        PageRequest pageRequest = PageRequest.of(page, size);
+        List<ItemRequest> itemRequestList = itemRequestRepository
+                .findAllByRequestorNotOrderByIdDesc(requestor, pageRequest);
+        return itemRequestList
                 .stream()
                 .map(ItemRequestMapper::toItemRequestDto)
                 .collect(Collectors.toList());

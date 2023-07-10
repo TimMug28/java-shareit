@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.Enum.StateEnum;
@@ -111,7 +112,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> findBookingUsers(StateEnum state, Long userId, Long from, Long size) {
+    public List<BookingDto> findBookingUsers(StateEnum state, Long userId, int from, int size) {
         if (size == 0 || from < 0 || size < 0) {
             throw new ValidationException("Неверный формат from или size.");
         }
@@ -119,41 +120,40 @@ public class BookingServiceImpl implements BookingService {
         if (booker.isEmpty()) {
             throw new NotFoundException("Пользователь не найден.");
         }
+        int page = from / size;
+        PageRequest pageRequest = PageRequest.of(page, size);
         User user = booker.get();
         LocalDateTime currentDate = LocalDateTime.now();
         List<Booking> result = new ArrayList<>();
         switch (state) {
             case ALL:
-                result = bookingRepository.findAllBookingsByBooker(user);
+                result = bookingRepository.findAllBookingsByBooker(user, pageRequest);
                 break;
             case FUTURE:
-                result = bookingRepository.findAllByBookerAndStartAfterOrderByStartDesc(user, currentDate);
+                result = bookingRepository.findAllByBookerAndStartAfterOrderByStartDesc(user, currentDate, pageRequest);
                 break;
             case CURRENT:
-                result = bookingRepository.findAllBookingsForBookerWithStartAndEnd(user, currentDate, currentDate);
+                result = bookingRepository.findAllBookingsForBookerWithStartAndEnd(user, currentDate, currentDate, pageRequest);
                 break;
             case PAST:
-                result = bookingRepository.findAllByBookerAndEndIsBeforeOrderByStartDesc(user, currentDate);
+                result = bookingRepository.findAllByBookerAndEndIsBeforeOrderByStartDesc(user, currentDate, pageRequest);
                 break;
             case WAITING:
-                result = bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.WAITING);
+                result = bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.WAITING, pageRequest);
                 break;
             case REJECTED:
-                result = bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED);
+                result = bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED, pageRequest);
                 break;
             default:
                 break;
         }
-        int startIndex = from.intValue();
-        int endIndex = Math.min(startIndex + size.intValue(), result.size());
-        List<Booking> paginatedResult = result.subList(startIndex, endIndex);
-        return paginatedResult.stream()
+        return result.stream()
                 .map(BookingMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<BookingDto> getOwnerBookings(Long userId, StateEnum state, Long from, Long size) {
+    public List<BookingDto> getOwnerBookings(Long userId, StateEnum state, int from, int size) {
         if (size == 0 || from < 0 || size < 0) {
             log.info("Неверный формат from или size.");
             throw new ValidationException("Неверный формат from или size.");
@@ -163,35 +163,34 @@ public class BookingServiceImpl implements BookingService {
             log.info("Не найден пользователь c id={}.", userId);
             throw new NotFoundException("Пользователь не найден.");
         }
+        int page = from / size;
+        PageRequest pageRequest = PageRequest.of(page, size);
         User user = owner.get();
         LocalDateTime currentDate = LocalDateTime.now();
         List<Booking> result = new ArrayList<>();
         switch (state) {
             case ALL:
-                result = bookingRepository.findAllBookingsByItem_Owner(user);
+                result = bookingRepository.findAllBookingsByItem_Owner(user, pageRequest);
                 break;
             case FUTURE:
-                result = bookingRepository.findAllByItem_OwnerAndStartIsAfterOrderByStartDesc(user, currentDate);
+                result = bookingRepository.findAllByItem_OwnerAndStartIsAfterOrderByStartDesc(user, currentDate, pageRequest);
                 break;
             case CURRENT:
-                result = bookingRepository.findAllByItem_OwnerAndStartBeforeAndEndAfterOrderByStartDesc(user, currentDate, currentDate);
+                result = bookingRepository.findAllByItem_OwnerAndStartBeforeAndEndAfterOrderByStartDesc(user, currentDate, currentDate, pageRequest);
                 break;
             case PAST:
-                result = bookingRepository.findAllByItem_OwnerAndEndIsBeforeOrderByStartDesc(user, currentDate);
+                result = bookingRepository.findAllByItem_OwnerAndEndIsBeforeOrderByStartDesc(user, currentDate, pageRequest);
                 break;
             case WAITING:
-                result = bookingRepository.findAllByItem_OwnerAndStatusEqualsOrderByStartDesc(user, StatusEnum.WAITING);
+                result = bookingRepository.findAllByItem_OwnerAndStatusEqualsOrderByStartDesc(user, StatusEnum.WAITING, pageRequest);
                 break;
             case REJECTED:
-                result = bookingRepository.findAllByItem_OwnerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED);
+                result = bookingRepository.findAllByItem_OwnerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED, pageRequest);
                 break;
             default:
                 break;
         }
-        int startIndex = from.intValue();
-        int endIndex = Math.min(startIndex + size.intValue(), result.size());
-        List<Booking> paginatedResult = result.subList(startIndex, endIndex);
-        return paginatedResult.stream()
+        return result.stream()
                 .map(BookingMapper::toDto)
                 .collect(Collectors.toList());
     }

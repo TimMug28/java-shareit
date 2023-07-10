@@ -32,8 +32,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestDto> getAllRequests(@RequestHeader("X-Sharer-User-Id") Long requesterId,
-                                               @RequestParam(name = "from", defaultValue = "0") Long from,
-                                               @RequestParam(name = "size", defaultValue = "20") Long size) {
+                                               @RequestParam(name = "from", defaultValue = "0") int from,
+                                               @RequestParam(name = "size", defaultValue = "20") int size) {
         log.info("GET /requests/all - получение списка запросов, созданных  пользователями.");
         return itemRequestService.getAllRequestOtherUsers(requesterId, from, size);
     }

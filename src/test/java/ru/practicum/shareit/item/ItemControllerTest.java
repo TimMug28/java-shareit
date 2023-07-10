@@ -111,8 +111,8 @@ public class ItemControllerTest {
 
     @Test
     void getAllItemsTest() throws Exception {
-        Long from = 0L;
-        Long size = 10L;
+        int from = 0;
+        int size = 10;
         Long ownerId = 1L;
         List<ItemDtoForBooking> itemList = new ArrayList<>();
         itemList.add(itemDtoForBooking);
@@ -164,8 +164,8 @@ public class ItemControllerTest {
 
     @Test
     void searchForItemByDescriptionTest() throws Exception {
-        Long from = 0L;
-        Long size = 10L;
+        int from = 0;
+        int size = 10;
         Long ownerId = 1L;
 
         List<ItemDto> itemList = new ArrayList<>();

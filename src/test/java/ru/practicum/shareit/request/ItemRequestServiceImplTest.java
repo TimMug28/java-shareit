@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -39,9 +40,11 @@ class ItemRequestServiceImplTest {
     @InjectMocks
     private ItemRequestServiceImpl itemRequestService;
 
-    ItemRequestDto itemRequestDto;
-    User requestor;
-    ItemRequest itemRequest;
+    private ItemRequestDto itemRequestDto;
+    private User requestor;
+    private ItemRequest itemRequest;
+    private ItemRequest itemRequest1;
+    private ItemRequest itemRequest2;
 
     @BeforeEach
     void start() {
@@ -59,6 +62,17 @@ class ItemRequestServiceImplTest {
         itemRequest.setRequestor(requestor);
         itemRequest.setCreated(LocalDateTime.now());
         itemRequest.setItems(new ArrayList<>());
+
+        itemRequest1 = new ItemRequest();
+        itemRequest1.setId(1L);
+        itemRequest1.setDescription("описание 1");
+        itemRequest1.setRequestor(requestor);
+
+        itemRequest2 = new ItemRequest();
+        itemRequest2.setId(2L);
+        itemRequest2.setDescription("описание 2");
+        itemRequest2.setRequestor(requestor);
+
     }
 
     @Test
@@ -94,16 +108,6 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getAllItemRequestTest() {
-        ItemRequest itemRequest1 = new ItemRequest();
-        itemRequest1.setId(1L);
-        itemRequest1.setDescription("описание 1");
-        itemRequest1.setRequestor(requestor);
-
-        ItemRequest itemRequest2 = new ItemRequest();
-        itemRequest2.setId(2L);
-        itemRequest2.setDescription("описание 2");
-        itemRequest2.setRequestor(requestor);
-
         List<ItemRequest> itemRequestList = new ArrayList<>();
         itemRequestList.add(itemRequest1);
         itemRequestList.add(itemRequest2);
@@ -178,28 +182,20 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getAllRequestOtherUsersTest() {
-        ItemRequest itemRequest1 = new ItemRequest();
-        itemRequest1.setId(1L);
-        itemRequest1.setDescription("описание 1");
-        itemRequest1.setRequestor(requestor);
-
-        ItemRequest itemRequest2 = new ItemRequest();
-        itemRequest2.setId(2L);
-        itemRequest2.setDescription("описание 2");
-        itemRequest2.setRequestor(requestor);
-
         List<ItemRequest> itemRequestList = new ArrayList<>();
         itemRequestList.add(itemRequest1);
         itemRequestList.add(itemRequest2);
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(requestor));
-        when(itemRequestRepository.findAllByRequestorNotOrderByIdDesc(requestor)).thenReturn(itemRequestList);
+        int page = 0 / 5;
+        PageRequest pageRequest = PageRequest.of(page, 5);
+        when(itemRequestRepository.findAllByRequestorNotOrderByIdDesc(requestor, pageRequest)).thenReturn(itemRequestList);
 
         List<ItemRequestDto> expectedResult = itemRequestList.stream()
                 .map(ItemRequestMapper::toItemRequestDto)
                 .collect(Collectors.toList());
 
-        List<ItemRequestDto> result = itemRequestService.getAllRequestOtherUsers(1L, 0L, 5L);
+        List<ItemRequestDto> result = itemRequestService.getAllRequestOtherUsers(1L, 0, 5);
 
         Assertions.assertThat(result)
                 .isNotNull()
@@ -208,14 +204,14 @@ class ItemRequestServiceImplTest {
                 .isEqualTo(expectedResult);
 
         Mockito.verify(userRepository, Mockito.times(1)).findById(1L);
-        Mockito.verify(itemRequestRepository, Mockito.times(1)).findAllByRequestorNotOrderByIdDesc(requestor);
+        Mockito.verify(itemRequestRepository, Mockito.times(1)).findAllByRequestorNotOrderByIdDesc(requestor, pageRequest);
         Mockito.verifyNoMoreInteractions(userRepository, itemRequestRepository);
     }
 
     @Test
     void getAllRequestOtherUsersValidationExceptionTest() {
         Throwable throwable = Assertions.catchThrowable(() ->
-                itemRequestService.getAllRequestOtherUsers(1L, -1L, 0L)
+                itemRequestService.getAllRequestOtherUsers(1L, -1, 0)
         );
 
         Assertions.assertThat(throwable)
@@ -230,7 +226,7 @@ class ItemRequestServiceImplTest {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         Throwable throwable = Assertions.catchThrowable(() ->
-                itemRequestService.getAllRequestOtherUsers(1L, 0L, 5L)
+                itemRequestService.getAllRequestOtherUsers(1L, 0, 5)
         );
 
         Assertions.assertThat(throwable)

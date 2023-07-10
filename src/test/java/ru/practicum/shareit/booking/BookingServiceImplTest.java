@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.booking.Enum.StateEnum;
 import ru.practicum.shareit.booking.Enum.StatusEnum;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -53,6 +54,9 @@ class BookingServiceImplTest {
     private BookingDto bookingDto;
     private Booking booking;
     private Booking booking2;
+    PageRequest pageRequest;
+    private int from;
+    private int size;
 
     private final LocalDateTime now = LocalDateTime.now();
 
@@ -100,6 +104,11 @@ class BookingServiceImplTest {
         bookingDto.setStatus(StatusEnum.WAITING);
         bookingDto.setStart(now.plusHours(1));
         bookingDto.setEnd(now.plusHours(2));
+
+        from = 0;
+        size = 10;
+        int page = from / size;
+        pageRequest = PageRequest.of(page, size);
     }
 
     @Test
@@ -274,15 +283,13 @@ class BookingServiceImplTest {
     void findBookingUsersAllStateTest() {
         StateEnum state = StateEnum.ALL;
         Long userId = 1L;
-        Long from = 0L;
-        Long size = 10L;
 
         List<Booking> bookings = new ArrayList<>();
         bookings.add(booking);
         bookings.add(booking2);
 
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        Mockito.when(bookingRepository.findAllBookingsByBooker(user)).thenReturn(bookings);
+        Mockito.when(bookingRepository.findAllBookingsByBooker(user, pageRequest)).thenReturn(bookings);
 
         List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
 
@@ -290,7 +297,7 @@ class BookingServiceImplTest {
         assertThat(result).hasSize(2);
 
         verify(userRepository, Mockito.times(1)).findById(userId);
-        verify(bookingRepository, Mockito.times(1)).findAllBookingsByBooker(user);
+        verify(bookingRepository, Mockito.times(1)).findAllBookingsByBooker(user, pageRequest);
         Mockito.verifyNoMoreInteractions(userRepository, bookingRepository);
     }
 
@@ -298,8 +305,6 @@ class BookingServiceImplTest {
     public void findBookingUsers_AllState_ReturnsAllBookingsByBooker() {
         StateEnum state = StateEnum.ALL;
         Long userId = 1L;
-        Long from = 0L;
-        Long size = 10L;
 
         User user = new User();
         user.setId(userId);
@@ -320,7 +325,7 @@ class BookingServiceImplTest {
         List<Booking> bookings = List.of(booking1, booking2);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(bookingRepository.findAllBookingsByBooker(user)).thenReturn(bookings);
+        when(bookingRepository.findAllBookingsByBooker(user, pageRequest)).thenReturn(bookings);
 
         List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
 
@@ -332,7 +337,7 @@ class BookingServiceImplTest {
         assertEquals(20L, result.get(1).getItem().getId());
 
         verify(userRepository, times(1)).findById(userId);
-        verify(bookingRepository, times(1)).findAllBookingsByBooker(user);
+        verify(bookingRepository, times(1)).findAllBookingsByBooker(user, pageRequest);
         verifyNoMoreInteractions(userRepository, bookingRepository);
     }
 
@@ -340,8 +345,6 @@ class BookingServiceImplTest {
     public void findBookingUsers_WaitingState_ReturnsWaitingBookingsByBooker() {
         StateEnum state = StateEnum.WAITING;
         Long userId = 1L;
-        Long from = 0L;
-        Long size = 10L;
 
         User user = new User();
         user.setId(userId);
@@ -364,7 +367,7 @@ class BookingServiceImplTest {
         List<Booking> bookings = List.of(booking1, booking2);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.WAITING)).thenReturn(bookings);
+        when(bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.WAITING, pageRequest)).thenReturn(bookings);
 
         List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
 
@@ -376,7 +379,7 @@ class BookingServiceImplTest {
         assertEquals(20L, result.get(1).getItem().getId());
 
         verify(userRepository, times(1)).findById(userId);
-        verify(bookingRepository, times(1)).findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.WAITING);
+        verify(bookingRepository, times(1)).findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.WAITING, pageRequest);
         verifyNoMoreInteractions(userRepository, bookingRepository);
     }
 
@@ -384,8 +387,6 @@ class BookingServiceImplTest {
     public void findBookingUsers_RejectedState_ReturnsRejectedBookingsByBooker() {
         StateEnum state = StateEnum.REJECTED;
         Long userId = 1L;
-        Long from = 0L;
-        Long size = 10L;
 
         User user = new User();
         user.setId(userId);
@@ -408,7 +409,7 @@ class BookingServiceImplTest {
         List<Booking> bookings = List.of(booking1, booking2);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED)).thenReturn(bookings);
+        when(bookingRepository.findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED, pageRequest)).thenReturn(bookings);
 
         List<BookingDto> result = bookingService.findBookingUsers(state, userId, from, size);
 
@@ -420,7 +421,7 @@ class BookingServiceImplTest {
         assertEquals(20L, result.get(1).getItem().getId());
 
         verify(userRepository, times(1)).findById(userId);
-        verify(bookingRepository, times(1)).findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED);
+        verify(bookingRepository, times(1)).findAllByBookerAndStatusEqualsOrderByStartDesc(user, StatusEnum.REJECTED, pageRequest);
         verifyNoMoreInteractions(userRepository, bookingRepository);
     }
 
@@ -428,8 +429,6 @@ class BookingServiceImplTest {
     public void findBookingUsers_InvalidUserId_ThrowsNotFoundException() {
         StateEnum state = StateEnum.ALL;
         Long userId = 1L;
-        Long from = 0L;
-        Long size = 10L;
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
@@ -443,8 +442,6 @@ class BookingServiceImplTest {
     public void findBookingUsers_UserNotFound_ThrowsNotFoundException() {
         StateEnum state = StateEnum.ALL;
         Long userId = 1L;
-        Long from = 0L;
-        Long size = 10L;
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
@@ -460,8 +457,6 @@ class BookingServiceImplTest {
     void findBookingUsersInvalidUserTest() {
         StateEnum state = StateEnum.ALL;
         Long userId = 2L;
-        Long from = 0L;
-        Long size = 10L;
 
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
@@ -477,8 +472,8 @@ class BookingServiceImplTest {
     void findBookingUsersInvalidParametersTest() {
         StateEnum state = StateEnum.ALL;
         Long userId = 1L;
-        Long from = -1L;
-        Long size = 0L;
+        int from = -1;
+        int size = 0;
 
         Assertions.assertThatThrownBy(() -> bookingService.findBookingUsers(state, userId, from, size))
                 .isInstanceOf(ValidationException.class)
@@ -491,15 +486,13 @@ class BookingServiceImplTest {
     void getOwnerBookingsAllStateTest() {
         Long userId = 1L;
         StateEnum state = StateEnum.ALL;
-        Long from = 0L;
-        Long size = 10L;
 
         List<Booking> bookings = new ArrayList<>();
         bookings.add(booking);
         bookings.add(booking2);
 
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        Mockito.when(bookingRepository.findAllBookingsByItem_Owner(user)).thenReturn(bookings);
+        Mockito.when(bookingRepository.findAllBookingsByItem_Owner(user, pageRequest)).thenReturn(bookings);
 
         List<BookingDto> result = bookingService.getOwnerBookings(userId, state, from, size);
 
@@ -507,7 +500,7 @@ class BookingServiceImplTest {
         assertThat(result).hasSize(2);
 
         verify(userRepository, Mockito.times(1)).findById(userId);
-        verify(bookingRepository, Mockito.times(1)).findAllBookingsByItem_Owner(user);
+        verify(bookingRepository, Mockito.times(1)).findAllBookingsByItem_Owner(user, pageRequest);
         Mockito.verifyNoMoreInteractions(userRepository, bookingRepository);
     }
 
@@ -515,8 +508,6 @@ class BookingServiceImplTest {
     void getOwnerBookingsInvalidUserTest() {
         Long userId = 2L;
         StateEnum state = StateEnum.ALL;
-        Long from = 0L;
-        Long size = 10L;
 
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
@@ -532,8 +523,8 @@ class BookingServiceImplTest {
     void getOwnerBookingsInvalidParametersTest() {
         Long userId = 1L;
         StateEnum state = StateEnum.ALL;
-        Long from = -1L;
-        Long size = 0L;
+        int from = -1;
+        int size = 0;
 
         Assertions.assertThatThrownBy(() -> bookingService.getOwnerBookings(userId, state, from, size))
                 .isInstanceOf(ValidationException.class)

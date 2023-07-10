@@ -29,6 +29,7 @@ public class UserControllerTest {
     private UserService userService;
 
     private UserDto userDto;
+    private Long userId;
 
     @BeforeEach
     public void setup() {
@@ -36,6 +37,7 @@ public class UserControllerTest {
         userDto.setId(1L);
         userDto.setName("user");
         userDto.setEmail("user@yandex.ru");
+        userId = 1L;
     }
 
     @Test
@@ -86,7 +88,6 @@ public class UserControllerTest {
 
     @Test
     void findUserByIdTest() throws Exception {
-        Long userId = 1L;
         Mockito.when(userService.findUserById(userId)).thenReturn(userDto);
 
         mockMvc.perform(get("/users/{id}", userId)
@@ -101,7 +102,6 @@ public class UserControllerTest {
 
     @Test
     void removeUserTest() throws Exception {
-        Long userId = 1L;
         mockMvc.perform(delete("/users/{id}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -112,7 +112,6 @@ public class UserControllerTest {
 
     @Test
     void updateUserTest() throws Exception {
-        Long userId = 1L;
         UserDto updatedUserDto = new UserDto();
         updatedUserDto.setName("UpdatedUser");
         updatedUserDto.setEmail("updatedUser@yandex.ru");

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -32,18 +33,35 @@ public class ItemRequestControllerTest {
     @MockBean
     private ItemRequestService itemRequestService;
 
+    private ItemRequestDto itemRequestDto;
+    private ItemRequestDto createdItemRequestDto;
+    private ItemRequestDto itemRequest1;
+    private ItemRequestDto itemRequest2;
+
+    @BeforeEach
+    void start() {
+        itemRequestDto = new ItemRequestDto();
+        itemRequestDto.setDescription("описание");
+
+        createdItemRequestDto = new ItemRequestDto();
+        createdItemRequestDto.setId(1L);
+        createdItemRequestDto.setDescription("описание");
+        createdItemRequestDto.setCreated(LocalDateTime.of(2023, 10, 5, 16, 23));
+
+        itemRequest1 = new ItemRequestDto();
+        itemRequest1.setId(1L);
+        itemRequest1.setDescription("Запрос 1");
+
+        itemRequest2 = new ItemRequestDto();
+        itemRequest2.setId(2L);
+        itemRequest2.setDescription("Запрос 2");
+    }
+
     @Test
     public void createRequestTest() throws Exception {
         Long ownerId = 1L;
-        ItemRequestDto itemRequestDto = new ItemRequestDto();
-        itemRequestDto.setDescription("описание");
 
-        ItemRequestDto createdItemRequestDto = new ItemRequestDto();
-        createdItemRequestDto.setId(1L);
-        createdItemRequestDto.setDescription("описание");
-        createdItemRequestDto.setCreated(LocalDateTime.of(2023,10,5,16,23));
-
-        when(itemRequestService.createRequest(any(ItemRequestDto.class),anyLong()))
+        when(itemRequestService.createRequest(any(ItemRequestDto.class), anyLong()))
                 .thenReturn(createdItemRequestDto);
 
         mockMvc.perform(post("/requests")
@@ -60,14 +78,6 @@ public class ItemRequestControllerTest {
     @Test
     void getAllItemRequestTest() throws Exception {
         Long userId = 1L;
-
-        ItemRequestDto itemRequest1 = new ItemRequestDto();
-        itemRequest1.setId(1L);
-        itemRequest1.setDescription("Запрос 1");
-
-        ItemRequestDto itemRequest2 = new ItemRequestDto();
-        itemRequest2.setId(2L);
-        itemRequest2.setDescription("Запрос 2");
 
         List<ItemRequestDto> itemRequests = Arrays.asList(itemRequest1, itemRequest2);
 
@@ -89,16 +99,8 @@ public class ItemRequestControllerTest {
     @Test
     void getAllRequestsTest() throws Exception {
         Long requesterId = 1L;
-        Long from = 0L;
-        Long size = 10L;
-
-        ItemRequestDto itemRequest1 = new ItemRequestDto();
-        itemRequest1.setId(1L);
-        itemRequest1.setDescription("Запрос 1");
-
-        ItemRequestDto itemRequest2 = new ItemRequestDto();
-        itemRequest2.setId(2L);
-        itemRequest2.setDescription("Запрос 2");
+        int from = 0;
+        int size = 10;
 
         List<ItemRequestDto> itemRequests = Arrays.asList(itemRequest1, itemRequest2);
 
