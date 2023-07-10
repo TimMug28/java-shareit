@@ -46,7 +46,7 @@ public class BookingControllerTest {
     private int size;
 
     @BeforeEach
-    void start(){
+    void start() {
         bookingId = 1L;
         ownerId = 1L;
         userId = 1L;

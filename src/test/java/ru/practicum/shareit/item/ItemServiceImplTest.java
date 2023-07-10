@@ -69,8 +69,6 @@ public class ItemServiceImplTest {
 
     @BeforeEach
     void start() {
-
-
         user = User.builder()
                 .id(1L)
                 .name("user")
