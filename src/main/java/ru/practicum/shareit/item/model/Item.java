@@ -3,10 +3,7 @@ package ru.practicum.shareit.item.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.user.model.User;
@@ -21,6 +18,7 @@ import java.util.List;
 @Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "items", schema = "public")
 public class Item {
     @Id
@@ -39,7 +37,7 @@ public class Item {
     @JoinColumn(name = "owner_id")
     private User owner;
     @Column(name = "request_id")
-    private Long request;
+    private Long requestId;
     @OneToMany(mappedBy = "item")
     @JsonBackReference
     private List<Booking> bookings;

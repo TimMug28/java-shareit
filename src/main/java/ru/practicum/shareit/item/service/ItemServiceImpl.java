@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingItemMapper;
 import ru.practicum.shareit.booking.Enum.StatusEnum;
@@ -19,10 +20,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoForBooking;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -33,40 +32,39 @@ import java.util.stream.Collectors;
 @Service
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
-    private final UserServiceImpl userService;
     private final UserRepository userRepository;
     private final BookingItemMapper bookingItemMapper;
     private final CommentRepository commentRepository;
 
     @Override
     public ItemDto createItem(ItemDto itemDto, Long owner) {
-
         Item item = ItemMapper.toItem(itemDto);
         if (owner == null) {
-            log.info("Пустое поле owner.");
             throw new ValidationException("Поле owner не может быть пустым.");
         }
         validate(item);
-        User user = UserMapper.toUser(userService.findUserById(owner));
+        Optional<User> getUser = userRepository.findById(owner);
+        if (getUser.isEmpty()) {
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        User user = getUser.get();
         item.setOwner(user);
-        ItemDto createdItem = ItemMapper.toItemDto(itemRepository.save(item));
-        log.info("Добавлена новая вещь: {}", createdItem);
-
-        return createdItem;
+        item.setRequestId(itemDto.getRequestId());
+        Item createItem = itemRepository.save(item);
+        ItemDto createdItemDto = ItemMapper.toItemDto(createItem);
+        return createdItemDto;
     }
 
     @Override
     public ItemDtoForBooking findItemById(Long id, Long ownerId) {
-
         ValidateUtil.validNumberNotNull(id, "id вещи не должно быть null.");
         Optional<Item> itemOptional = itemRepository.findById(id);
         if (itemOptional.isEmpty()) {
-            ValidateUtil.throwNotFound(String.format("Вещь с %d не найдена.", id));
+            ValidateUtil.throwNotFound(String.format("Вещь с id %d не найдена.", id));
             return null;
         }
         Optional<User> owner = userRepository.findById(ownerId);
         if (owner.isEmpty()) {
-            log.info("Не найден пользователь c id={}.", ownerId);
             throw new NotFoundException("Пользователь не найден.");
         }
         Item item = itemOptional.get();
@@ -113,8 +111,8 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() != null) {
             itemOld.setAvailable(itemDto.getAvailable());
         }
-        if (itemDto.getRequest() != null) {
-            itemOld.setRequest(itemDto.getRequest());
+        if (itemDto.getRequestId() != null) {
+            itemOld.setRequestId(itemDto.getRequestId());
         }
         ItemDto updateItem = ItemMapper.toItemDto(itemRepository.save(itemOld));
         log.info("Отредактирована вещь c id={}.", id);
@@ -122,19 +120,25 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoForBooking> getAllItems(Long ownerId) {
+    public List<ItemDtoForBooking> getAllItems(Long ownerId, int from, int size) {
+        if (size == 0 || from < 0 || size < 0) {
+            log.info("Неверный формат from или size.");
+            throw new ValidationException("Неверный формат from или size.");
+        }
         Optional<User> userOptional = userRepository.findById(ownerId);
         if (userOptional.isEmpty()) {
             log.info("Не найден пользователь c id={}.", ownerId);
             throw new NotFoundException("Пользователь не найден.");
         }
-        List<Item> items = itemRepository.findAllByOwnerOrderById(userOptional.get());
+        int page = from / size;
+        PageRequest pageRequest = PageRequest.of(page, size);
+        List<Item> paginatedItems = itemRepository.findAllByOwnerOrderById(userOptional.get(), pageRequest);
+
         List<ItemDtoForBooking> itemDtoForBookingSet = new ArrayList<>();
         LocalDateTime localDateTime = LocalDateTime.now();
-        for (Item item : items) {
+        for (Item item : paginatedItems) {
             ItemDtoForBooking itemDtoForBooking = ItemMapperBooking.toDto(item);
             List<Booking> bookings = item.getBookings();
-
             Booking lastBooking = findLast(bookings, localDateTime);
             Booking nextBooking = findNext(bookings, localDateTime);
             itemDtoForBooking.setLastBooking(lastBooking != null
@@ -152,28 +156,24 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchForItemByDescription(String text, Long owner) {
+    public List<ItemDto> searchForItemByDescription(String text, Long owner, int from, int size) {
+        if (size == 0 || from < 0 || size < 0) {
+            log.info("Неверный формат from или size.");
+            throw new ValidationException("Неверный формат from или size.");
+        }
         String description = text.toLowerCase();
-        List<Item> itemList = itemRepository.searchItemsByDescription(text);
+        int page = from / size;
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        List<Item> itemList = itemRepository.searchItemsByDescription(text, pageRequest);
         log.info("Запрошены вещи по ключевому слову={}.", description);
+
         return itemList
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .filter(ItemDto::getAvailable)
                 .sorted(Comparator.comparing(ItemDto::getId))
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ItemDto> findItemsByUserId(Long ownerId) {
-        User owner = userRepository.findById(ownerId).orElseThrow(() ->
-                new NotFoundException("Ошибка при получении списка вещей пользователя с ID = " + ownerId));
-        List<Item> items = itemRepository.findAllByOwnerOrderById(owner);
-        List<ItemDto> result = new ArrayList<>();
-        for (Item item : items) {
-            result.add(ItemMapper.toItemDto(item));
-        }
-        return result;
     }
 
     @Override
@@ -215,17 +215,14 @@ public class ItemServiceImpl implements ItemService {
         return commentD;
     }
 
-    private void validate(Item item) {
+    public void validate(Item item) {
         if (item.getName() == null || item.getName().isBlank()) {
-            log.info("Пустое поле name.");
             throw new ValidationException("Поле name не может быть пустым.");
         }
         if (item.getDescription() == null || item.getDescription().isBlank()) {
-            log.info("Пустое поле description.");
             throw new ValidationException("Поле description не может быть пустым.");
         }
         if (item.getAvailable() == null) {
-            log.info("Пустое поле available.");
             throw new ValidationException("Поле available не может быть пустым.");
         }
     }

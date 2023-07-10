@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import ru.practicum.shareit.booking.Enum.StatusEnum;
 
 import java.time.LocalDateTime;
@@ -12,7 +11,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@ToString
 public class BookingDtoItem {
     private Long id;
     @JsonAlias({"start"})

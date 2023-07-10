@@ -12,7 +12,7 @@ public interface BookingService {
 
     BookingDto updateBookingStatus(Long id, boolean approved, Long ownerId);
 
-    List<BookingDto> findBookingUsers(StateEnum state, Long userid);
+    List<BookingDto> findBookingUsers(StateEnum state, Long userid, int from, int size);
 
-    List<BookingDto> getOwnerBookings(Long userId, StateEnum state);
+    List<BookingDto> getOwnerBookings(Long userId, StateEnum state, int from, int size);
 }
