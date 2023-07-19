@@ -1,14 +1,25 @@
 package ru.practicum.shareit.request.dto;
 
 import lombok.Data;
+import ru.practicum.shareit.item.model.Item;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Data
 public class ItemRequestDto {
-    private Integer id;
+    private Long id;
+    @NotNull
     private String description;
-    private Integer requestor;
+    private Requestor requestor;
     private LocalDateTime created;
+    private List<Item> items;
+
+    @Data
+    public static class Requestor {
+        private final long id;
+        private final String name;
+    }
 }

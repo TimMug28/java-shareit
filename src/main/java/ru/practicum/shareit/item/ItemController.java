@@ -21,44 +21,42 @@ public class ItemController {
     @PostMapping
     public ItemDto createItem(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long owner,
                               @RequestBody @Validated ItemDto itemDto) {
-        log.info("POST /items - создание новой вещи.");
         return itemService.createItem(itemDto, owner);
     }
 
     @GetMapping("/{itemId}")
     public ItemDtoForBooking findItemById(@RequestHeader(value = "X-Sharer-User-Id") Long owner,
                                           @PathVariable Long itemId) {
-        log.info("GET /items - запрос вещи по id.");
         return itemService.findItemById(itemId, owner);
     }
 
     @GetMapping()
-    public List<ItemDtoForBooking> getAllItems(@RequestHeader("X-Sharer-User-Id") Long owner) {
-        log.info("GET /items - запрос вещей пользователя " + owner);
-        return itemService.getAllItems(owner);
+    public List<ItemDtoForBooking> getAllItems(@RequestHeader("X-Sharer-User-Id") Long owner,
+                                               @RequestParam(name = "from", defaultValue = "0") int from,
+                                               @RequestParam(name = "size", defaultValue = "20") int size) {
+        return itemService.getAllItems(owner, from, size);
     }
 
     @PatchMapping("{itemId}")
     public ItemDto updateItem(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long owner,
                               @PathVariable Long itemId,
                               @RequestBody ItemDto itemDto) {
-        log.info("PATCH /items - создание изменение вещи.");
         return itemService.updateItem(itemId, owner, itemDto);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchForItemByDescription(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long owner,
-                                                    @RequestParam(defaultValue = "null") String text
+                                                    @RequestParam(defaultValue = "null") String text,
+                                                    @RequestParam(name = "from", defaultValue = "0") int from,
+                                                    @RequestParam(name = "size", defaultValue = "20") int size
     ) {
-        log.info("GET /items/search?text= " + text);
-        return itemService.searchForItemByDescription(text, owner);
+        return itemService.searchForItemByDescription(text, owner, from, size);
     }
 
     @PostMapping("{itemId}/comment")
     public CommentDto createComment(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId,
                                     @PathVariable Long itemId,
                                     @RequestBody @Validated CommentDto commentDto) {
-        log.info("POST /comment - добавление комментария.");
         return itemService.createComment(commentDto, itemId, userId);
     }
 

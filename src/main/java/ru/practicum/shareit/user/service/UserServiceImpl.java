@@ -58,9 +58,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(Long id, UserDto userDto) {
-
-        User user = userRepository.getReferenceById(id);
-        if (user.getId() != null) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
             if (userDto.getName() != null) {
                 user.setName(userDto.getName());
             }
