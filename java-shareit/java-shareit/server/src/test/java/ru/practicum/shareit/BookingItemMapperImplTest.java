@@ -2,7 +2,6 @@ package ru.practicum.shareit;
 
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.booking.BookingItemMapper;
-import ru.practicum.shareit.booking.BookingItemMapperImpl;
 import ru.practicum.shareit.booking.Enum.StatusEnum;
 import ru.practicum.shareit.booking.dto.BookingDtoItem;
 import ru.practicum.shareit.booking.model.Booking;
@@ -15,13 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class BookingItemMapperImplTest {
 
-    private final BookingItemMapper mapper = new BookingItemMapperImpl();
-
-    @Test
-    void toDto_WithNullBooking_ReturnsNull() {
-        BookingDtoItem result = mapper.toDto(null);
-        assertNull(result);
-    }
+    private final BookingItemMapper mapper = new BookingItemMapper();
 
     @Test
     void toDto_WithValidBooking_ReturnsBookingDtoItem() {

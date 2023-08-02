@@ -23,7 +23,7 @@ services:
       #      - TZ=Europe/Moscow
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=iamroot
+      - SPRING_DATASOURCE_PASSWORD=root
 
   db:
     image: postgres:15.2-alpine
@@ -32,4 +32,4 @@ services:
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=iamroot
+      - POSTGRES_PASSWORD=root
