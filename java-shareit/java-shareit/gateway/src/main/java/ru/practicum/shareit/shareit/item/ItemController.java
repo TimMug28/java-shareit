@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.shareit.item.dto.CommentNewRequestDto;
+import ru.practicum.shareit.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.shareit.item.dto.ItemRequestDto;
 import ru.practicum.shareit.shareit.utils.Utils;
 
@@ -72,9 +72,9 @@ public class ItemController {
     public ResponseEntity<Object> createComment(
             @RequestHeader(value = "X-Sharer-User-Id") long userId,
             @PathVariable long itemId,
-            @Valid @RequestBody CommentNewRequestDto commentNewDto
+            @Valid @RequestBody CommentRequestDto commentDto
     ) {
-        return itemClient.createComment(commentNewDto, itemId, userId);
+        return itemClient.createComment(commentDto, itemId, userId);
     }
 }
 

@@ -8,7 +8,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.shareit.client.BaseClient;
-import ru.practicum.shareit.shareit.item.dto.CommentNewRequestDto;
+import ru.practicum.shareit.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.shareit.item.dto.ItemRequestDto;
 
 import java.util.Map;
@@ -30,11 +30,11 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> updateItem(long userId, long id, ItemRequestDto itemDto) {
-        return patch("/" + id, userId, itemDto);
+        return patch("/" + userId, id, itemDto);
     }
 
     public ResponseEntity<Object> findItemById(Long userId, Long id) {
-        return get("/" + id, userId);
+        return get("/" + userId, id);
     }
 
     public ResponseEntity<Object> getAllItems(Long userId, int from, int size) {
@@ -45,7 +45,7 @@ public class ItemClient extends BaseClient {
         return get("?from={from}&size={size}", userId, parameters);
     }
 
-    public ResponseEntity<Object> searchForItemByDescription(String text, Long userId , int from, int size) {
+    public ResponseEntity<Object> searchForItemByDescription(String text, Long userId, int from, int size) {
         Map<String, Object> parameters = Map.of(
                 "text", text,
                 "from", from,
@@ -54,8 +54,8 @@ public class ItemClient extends BaseClient {
         return get("/search?text={text}&from={from}&size={size}", null, parameters);
     }
 
-    public ResponseEntity<Object> createComment(CommentNewRequestDto commentNewDto,long itemId,long userId ) {
-        return post("/" + itemId + "/comment", userId, commentNewDto);
+    public ResponseEntity<Object> createComment(CommentRequestDto commentDto, long itemId, long userId) {
+        return post("/" + itemId + "/comment", userId, commentDto);
     }
 }
 

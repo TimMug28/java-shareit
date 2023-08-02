@@ -2,7 +2,6 @@ package ru.practicum.shareit.shareit.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.shareit.exceptions.ValidationException;
 
 

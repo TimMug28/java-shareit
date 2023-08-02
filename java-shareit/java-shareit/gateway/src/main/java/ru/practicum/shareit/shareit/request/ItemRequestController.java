@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.shareit.request.dto.ItemRequestNewDto;
+import ru.practicum.shareit.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.shareit.utils.Utils;
 
 import javax.validation.Valid;
@@ -22,22 +22,22 @@ public class ItemRequestController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createRequest(
-            @RequestHeader("X-Sharer-User-Id") long owner,
-            @Valid @RequestBody ItemRequestNewDto requestDto
+            @RequestHeader("X-Sharer-User-Id") Long owner,
+            @Valid @RequestBody ItemRequestDto requestDto
     ) {
         return requestClient.createRequest(requestDto, owner);
     }
 
     @GetMapping
     public ResponseEntity<Object> getAllItemRequest(
-            @RequestHeader("X-Sharer-User-Id") long id
+            @RequestHeader("X-Sharer-User-Id") Long id
     ) {
         return requestClient.getAllItemRequest(id);
     }
 
     @GetMapping("/all")
     public ResponseEntity<Object> getAllRequests(
-            @RequestHeader("X-Sharer-User-Id") long requesterId,
+            @RequestHeader("X-Sharer-User-Id") Long requesterId,
             @RequestParam(defaultValue = "0") int from,
             @RequestParam(defaultValue = "20") int size
     ) {
@@ -45,10 +45,10 @@ public class ItemRequestController {
         return requestClient.getAllRequests(requesterId, from, size);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{requestId}")
     public ResponseEntity<Object> getItemRequestById(
-            @RequestHeader("X-Sharer-User-Id") long requesterId,
-            @PathVariable long requestId
+            @RequestHeader("X-Sharer-User-Id") Long requesterId,
+            @PathVariable Long requestId
     ) {
         return requestClient.getItemRequestById(requesterId, requestId);
     }

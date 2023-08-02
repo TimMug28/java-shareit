@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemRequestNewDto {
+public class ItemRequestDto {
 
     @NotEmpty
     @Size(max = 255)

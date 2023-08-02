@@ -32,7 +32,7 @@ public class User {
     private String name;
     @Email
     @NotBlank
-    @Column(name = "email")
+    @Column(unique = true)
     private String email;
     @OneToMany(mappedBy = "owner")
     @JsonIgnore
