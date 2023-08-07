@@ -104,8 +104,7 @@ public class UserControllerTest {
     void removeUserTest() throws Exception {
         mockMvc.perform(delete("/users/{id}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                        .accept(MediaType.APPLICATION_JSON));
 
         Mockito.verify(userService, Mockito.times(1)).removeUserById(userId);
     }

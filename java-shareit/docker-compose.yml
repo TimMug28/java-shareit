@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   gateway:
-    build: ../gateway
+    build: ../java-shareit/gateway
     container_name: gateway
     depends_on:
       - server
@@ -13,7 +13,7 @@ services:
       - SHAREIT_SERVER_URL=http://server:9090
 
   server:
-    build: ../server
+    build: ../java-shareit/server
     container_name: server
     depends_on:
       - db
@@ -23,8 +23,7 @@ services:
       #      - TZ=Asia/Yekaterinburg
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=root
-
+      - SPRING_DATASOURCE_PASSWORD=iamroot
   db:
     image: postgres:15.2-alpine
     ports:
@@ -32,4 +31,4 @@ services:
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=root
+      - POSTGRES_PASSWORD=iamroot
