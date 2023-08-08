@@ -9,7 +9,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      #      - TZ=Asia/Yekaterinburg
+      #      - TZ=Europe/Moscow
       - SHAREIT_SERVER_URL=http://server:9090
 
   server:
@@ -20,7 +20,7 @@ services:
     ports:
       - "9090:9090"
     environment:
-      #      - TZ=Asia/Yekaterinburg
+      #      - TZ=Europe/Moscow
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=iamroot
