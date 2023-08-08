@@ -10,7 +10,7 @@ import ru.practicum.shareit.shareit.user.dto.UserDto;
 
 import javax.validation.Valid;
 
-@RestController
+@Controller
 @RequestMapping("/users")
 @RequiredArgsConstructor
 @Validated
