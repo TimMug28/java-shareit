@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="10.3">
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\booking\BookingClient.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\booking\BookingController.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\booking\dto\BookingNewRequestDto.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\client\BaseClient.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\exceptions\ConflictException.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\exceptions\ErrorHandler.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\exceptions\ErrorResponse.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\exceptions\NotFoundException.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\exceptions\ValidationException.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\item\dto\CommentRequestDto.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\item\dto\ItemRequestDto.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\item\ItemClient.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\item\ItemController.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\request\dto\ItemRequestDto.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\request\ItemRequestClient.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\request\ItemRequestController.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\ShareItGateway.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\user\dto\UserDto.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\user\UserClient.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\user\UserController.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\java\ru\practicum\shareit\shareit\utils\Utils.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\gateway\src\main\resources\application.properties">
+</file>
+</checkstyle>

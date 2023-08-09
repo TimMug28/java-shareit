@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="10.3">
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\booking\BookingController.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\booking\BookingItemMapper.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\booking\BookingMapper.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\booking\dto\BookingDto.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\booking\dto\BookingDtoItem.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\booking\Enum\StateEnum.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\booking\Enum\StatusEnum.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\booking\model\Booking.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\booking\repository\BookingRepository.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\booking\service\BookingService.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\booking\service\BookingServiceImpl.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\exceptions\ConflictException.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\exceptions\NotFoundException.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\exceptions\ValidateUtil.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\exceptions\ValidationException.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\handler\ErrorHandler.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\handler\ErrorResponse.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\item\comment\Comment.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\item\comment\CommentDto.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\item\comment\CommentMapper.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\item\comment\repository\CommentRepository.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\item\dto\ItemDto.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\item\dto\ItemDtoForBooking.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\item\ItemController.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\item\ItemMapper.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\item\ItemMapperBooking.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\item\model\Item.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\item\repository\ItemRepository.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\item\service\ItemService.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\item\service\ItemServiceImpl.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\request\dto\ItemRequestDto.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\request\ItemRequestController.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\request\ItemRequestMapper.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\request\model\ItemRequest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\request\repository\ItemRequestRepository.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\request\service\ItemRequestService.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\request\service\ItemRequestServiceImpl.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\ShareItServer.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\user\dto\UserDto.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\user\model\User.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\user\repository\UserRepository.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\user\service\UserService.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\user\service\UserServiceImpl.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\user\UserController.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\java\ru\practicum\shareit\user\UserMapper.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\booking\BookingControllerTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\booking\BookingMapperTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\booking\BookingRepositoryTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\booking\BookingServiceImplTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\BookingItemMapperImplTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\ErrorHandlerTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\item\CommentMapperTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\item\ItemControllerTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\item\ItemMapperTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\item\ItemRepositoryTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\item\ItemServiceImplTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\request\ItemRequestControllerTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\request\ItemRequestMapperTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\request\ItemRequestRepositoryTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\request\ItemRequestServiceImplTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\request\ItemRequestTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\ShareItTests.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\user\UserControllerTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\user\UserMapperTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\user\UserServiceImplTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\user\UserTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\test\java\ru\practicum\shareit\ValidateUtilTest.java">
+</file>
+<file name="C:\Users\timur\IdeaProjects\java-shareit\server\src\main\resources\application.properties">
+</file>
+</checkstyle>

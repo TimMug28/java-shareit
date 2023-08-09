@@ -1,0 +1,22 @@
+#Wed Aug 09 21:02:50 YEKT 2023
+configuration*?=970F25696D301850B7A1F8D1DB8F8792F1BF1FDC
+module-resource*?\:suppressions.xml=B6C56B864127A55986A2D096B53D68E97E9F54B7
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\booking\\BookingController.java=1691426826463
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\exceptions\\ValidationException.java=1690993322505
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\user\\dto\\UserDto.java=1690902698797
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\request\\ItemRequestController.java=1691426821009
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\user\\UserClient.java=1691166857969
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\item\\ItemClient.java=1691166857977
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\request\\dto\\ItemRequestDto.java=1690993174582
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\booking\\dto\\BookingNewRequestDto.java=1690819437433
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\item\\dto\\ItemRequestDto.java=1690819437410
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\user\\UserController.java=1691505515583
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\request\\ItemRequestClient.java=1691166857980
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\item\\ItemController.java=1691426819797
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\resources\\application.properties=1691219676156
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\booking\\BookingClient.java=1691166857974
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\exceptions\\NotFoundException.java=1690900097506
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\exceptions\\ErrorResponse.java=1690899831671
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\exceptions\\ErrorHandler.java=1690992852289
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\item\\dto\\CommentRequestDto.java=1690993055556
+C\:\\Users\\timur\\IdeaProjects\\java-shareit\\gateway\\src\\main\\java\\ru\\practicum\\shareit\\shareit\\ShareItGateway.java=1690822122764
