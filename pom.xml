@@ -48,7 +48,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                         <systemPropertyVariables>
-                            <testFailureIgnore>true</testFailureIgnore>
+                            <spring.profiles.active>test</spring.profiles.active>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
