@@ -11,8 +11,6 @@ import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.item.model.Item;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,11 +25,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    @NotBlank
     @Column(name = "user_name")
     private String name;
-    @Email
-    @NotBlank
     @Column(unique = true)
     private String email;
     @OneToMany(mappedBy = "owner")

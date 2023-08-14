@@ -36,9 +36,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto createBooking(BookingDto bookingDto, Long ownerId) {
-        if (ownerId == null) {
-            throw new ValidationException("Поле owner не может быть пустым.");
-        }
+
         Optional<User> userOptional = userRepository.findById(ownerId);
         if (userOptional.isEmpty()) {
             throw new NotFoundException("Пользователь не найден.");
@@ -56,7 +54,6 @@ public class BookingServiceImpl implements BookingService {
         if (!item.getAvailable()) {
             throw new ValidationException("Запрос на бронирование отклонен");
         }
-        validateDate(bookingDto);
         bookingDto.setStatus(StatusEnum.WAITING);
         Booking booking = BookingMapper.toBooking(bookingDto, booker, item);
         Booking newBooking = bookingRepository.save(booking);
@@ -113,9 +110,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> findBookingUsers(StateEnum state, Long userId, int from, int size) {
-        if (size == 0 || from < 0 || size < 0) {
-            throw new ValidationException("Неверный формат from или size.");
-        }
+
         Optional<User> booker = userRepository.findById(userId);
         if (booker.isEmpty()) {
             throw new NotFoundException("Пользователь не найден.");
@@ -154,10 +149,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getOwnerBookings(Long userId, StateEnum state, int from, int size) {
-        if (size == 0 || from < 0 || size < 0) {
-            log.info("Неверный формат from или size.");
-            throw new ValidationException("Неверный формат from или size.");
-        }
+
         Optional<User> owner = userRepository.findById(userId);
         if (owner.isEmpty()) {
             log.info("Не найден пользователь c id={}.", userId);
@@ -193,18 +185,5 @@ public class BookingServiceImpl implements BookingService {
         return result.stream()
                 .map(BookingMapper::toDto)
                 .collect(Collectors.toList());
-    }
-
-    private void validateDate(BookingDto bookingDto) {
-        if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {
-            throw new ValidationException("Время начала и окончания бронирования не должны быть пустыми.");
-        }
-
-        if (bookingDto.getStart().isEqual(bookingDto.getEnd()) || bookingDto.getStart().isAfter(bookingDto.getEnd())) {
-            throw new ValidationException("Время начала и окончания бронирования совпадают.");
-        }
-        if (bookingDto.getStart().isBefore(LocalDateTime.now().minusSeconds(1))) {
-            throw new ValidationException("Время начала бронирования не может быть в прошлом.");
-        }
     }
 }

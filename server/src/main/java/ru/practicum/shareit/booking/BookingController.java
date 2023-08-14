@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.Enum.StateEnum;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.exceptions.ValidationException;
 
 import java.util.List;
 
@@ -42,12 +41,9 @@ public class BookingController {
                                              @RequestHeader(value = "X-Sharer-User-Id") Long userId,
                                              @RequestParam(name = "from", defaultValue = "0") int from,
                                              @RequestParam(name = "size", defaultValue = "20") int size) {
-        try {
             StateEnum status = StateEnum.valueOf(state);
             return bookingService.findBookingUsers(status, userId, from, size);
-        } catch (IllegalArgumentException e) {
-            throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
-        }
+
     }
 
     @GetMapping("/owner")
@@ -55,11 +51,7 @@ public class BookingController {
                                              @RequestHeader(value = "X-Sharer-User-Id") Long userId,
                                              @RequestParam(name = "from", defaultValue = "0") int from,
                                              @RequestParam(name = "size", defaultValue = "20") int size) {
-        try {
             StateEnum status = StateEnum.valueOf(state);
             return bookingService.getOwnerBookings(userId, status, from, size);
-        } catch (IllegalArgumentException e) {
-            throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
-        }
     }
 }

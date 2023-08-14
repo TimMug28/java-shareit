@@ -18,7 +18,6 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -452,7 +451,6 @@ class BookingServiceImplTest {
     }
 
 
-
     @Test
     void findBookingUsersInvalidUserTest() {
         StateEnum state = StateEnum.ALL;
@@ -468,19 +466,6 @@ class BookingServiceImplTest {
         Mockito.verifyNoMoreInteractions(userRepository, bookingRepository);
     }
 
-    @Test
-    void findBookingUsersInvalidParametersTest() {
-        StateEnum state = StateEnum.ALL;
-        Long userId = 1L;
-        int from = -1;
-        int size = 0;
-
-        Assertions.assertThatThrownBy(() -> bookingService.findBookingUsers(state, userId, from, size))
-                .isInstanceOf(ValidationException.class)
-                .hasMessage("Неверный формат from или size.");
-
-        Mockito.verifyNoInteractions(userRepository, bookingRepository);
-    }
 
     @Test
     void getOwnerBookingsAllStateTest() {
@@ -517,30 +502,6 @@ class BookingServiceImplTest {
 
         verify(userRepository, Mockito.times(1)).findById(userId);
         Mockito.verifyNoMoreInteractions(userRepository, bookingRepository);
-    }
-
-    @Test
-    void getOwnerBookingsInvalidParametersTest() {
-        Long userId = 1L;
-        StateEnum state = StateEnum.ALL;
-        int from = -1;
-        int size = 0;
-
-        Assertions.assertThatThrownBy(() -> bookingService.getOwnerBookings(userId, state, from, size))
-                .isInstanceOf(ValidationException.class)
-                .hasMessage("Неверный формат from или size.");
-
-        Mockito.verifyNoInteractions(userRepository, bookingRepository);
-    }
-
-    @Test
-    public void createBooking_NullOwnerId_ThrowsValidationException() {
-        BookingDto bookingDto = new BookingDto();
-        Long ownerId = null;
-
-        assertThrows(ValidationException.class, () -> {
-            bookingService.createBooking(bookingDto, ownerId);
-        });
     }
 
     @Test

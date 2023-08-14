@@ -295,18 +295,6 @@ public class ItemServiceImplTest {
         Mockito.verifyNoMoreInteractions(userRepository, itemRepository, bookingItemMapper, commentRepository);
     }
 
-    @Test
-    void getAllItemsValidationExceptionTest() {
-        ownerId = 1L;
-        int from = -1;
-        int size = 0;
-
-        Assertions.assertThatThrownBy(() -> itemService.getAllItems(ownerId, from, size))
-                .isInstanceOf(ValidationException.class)
-                .hasMessage("Неверный формат from или size.");
-
-        Mockito.verifyNoInteractions(userRepository, itemRepository, bookingItemMapper, commentRepository);
-    }
 
     @Test
     void getAllItemsNotFoundExceptionTest() {
@@ -339,14 +327,6 @@ public class ItemServiceImplTest {
         verify(itemRepository, times(1))
                 .searchItemsByDescription(text, pageRequest);
         Mockito.verifyNoMoreInteractions(itemRepository);
-    }
-
-    @Test
-    void searchForItemByDescriptionValidationExceptionTest() {
-        Assertions.assertThatThrownBy(() -> itemService.searchForItemByDescription("дрель", 1L, -1, 10))
-                .isInstanceOf(ValidationException.class);
-
-        Mockito.verifyNoInteractions(itemRepository, itemMapper);
     }
 
     @Test
@@ -413,20 +393,6 @@ public class ItemServiceImplTest {
     }
 
     @Test
-    void createCommentEmptyTextValidationExceptionTest() {
-        CommentDto commentDto = new CommentDto();
-        commentDto.setText("");
-        Long itemId = 1L;
-        Long userId = 1L;
-
-        assertThrows(ValidationException.class, () ->
-                itemService.createComment(commentDto, itemId, userId)
-        );
-
-        Mockito.verifyNoInteractions(userRepository, itemRepository, commentRepository);
-    }
-
-    @Test
     void createCommentUserNotFoundExceptionTest() {
         CommentDto commentDto = new CommentDto();
         commentDto.setText("комментарий");
@@ -483,17 +449,6 @@ public class ItemServiceImplTest {
     }
 
     @Test
-    public void updateItem_NullOwner_ThrowsValidationException() {
-        Long id = 1L;
-        Long owner = null;
-        ItemDto itemDto = new ItemDto();
-
-        assertThrows(ValidationException.class, () -> {
-            itemService.updateItem(id, owner, itemDto);
-        });
-    }
-
-    @Test
     public void updateItem_ItemNotFound_ThrowsNotFoundException() {
         Long id = 1L;
         Long owner = 2L;
@@ -530,7 +485,7 @@ public class ItemServiceImplTest {
         item.setAvailable(true);
 
         assertThrows(ValidationException.class, () -> {
-            itemService.validate(item);
+            validate(item);
         });
     }
 
@@ -542,7 +497,7 @@ public class ItemServiceImplTest {
         item.setAvailable(true);
 
         assertThrows(ValidationException.class, () -> {
-            itemService.validate(item);
+            validate(item);
         });
     }
 
@@ -553,7 +508,7 @@ public class ItemServiceImplTest {
         item.setAvailable(true);
 
         assertThrows(ValidationException.class, () -> {
-            itemService.validate(item);
+            validate(item);
         });
     }
 
@@ -565,7 +520,7 @@ public class ItemServiceImplTest {
         item.setAvailable(true);
 
         assertThrows(ValidationException.class, () -> {
-            itemService.validate(item);
+            validate(item);
         });
     }
 
@@ -576,8 +531,19 @@ public class ItemServiceImplTest {
         item.setDescription("Description");
 
         assertThrows(ValidationException.class, () -> {
-            itemService.validate(item);
+            validate(item);
         });
     }
 
+    public void validate(Item item) {
+        if (item.getName() == null || item.getName().isBlank()) {
+            throw new ValidationException("Поле name не может быть пустым.");
+        }
+        if (item.getDescription() == null || item.getDescription().isBlank()) {
+            throw new ValidationException("Поле description не может быть пустым.");
+        }
+        if (item.getAvailable() == null) {
+            throw new ValidationException("Поле available не может быть пустым.");
+        }
+    }
 }

@@ -39,10 +39,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto createItem(ItemDto itemDto, Long owner) {
         Item item = ItemMapper.toItem(itemDto);
-        if (owner == null) {
-            throw new ValidationException("Поле owner не может быть пустым.");
-        }
-        validate(item);
         Optional<User> getUser = userRepository.findById(owner);
         if (getUser.isEmpty()) {
             throw new NotFoundException("Пользователь не найден.");
@@ -57,7 +53,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDtoForBooking findItemById(Long id, Long ownerId) {
-        ValidateUtil.validNumberNotNull(id, "id вещи не должно быть null.");
         Optional<Item> itemOptional = itemRepository.findById(id);
         if (itemOptional.isEmpty()) {
             ValidateUtil.throwNotFound(String.format("Вещь с id %d не найдена.", id));
@@ -90,9 +85,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto updateItem(Long id, Long owner, ItemDto itemDto) {
-        if (owner == null) {
-            throw new ValidationException("Не указан владелец вещи.");
-        }
         Optional<Item> item = itemRepository.findById(id);
         if (item.isEmpty()) {
             ValidateUtil.throwNotFound(String.format("Вещь с %d не найдена.", id));
@@ -121,10 +113,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDtoForBooking> getAllItems(Long ownerId, int from, int size) {
-        if (size == 0 || from < 0 || size < 0) {
-            log.info("Неверный формат from или size.");
-            throw new ValidationException("Неверный формат from или size.");
-        }
         Optional<User> userOptional = userRepository.findById(ownerId);
         if (userOptional.isEmpty()) {
             log.info("Не найден пользователь c id={}.", ownerId);
@@ -157,10 +145,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchForItemByDescription(String text, Long owner, int from, int size) {
-        if (size == 0 || from < 0 || size < 0) {
-            log.info("Неверный формат from или size.");
-            throw new ValidationException("Неверный формат from или size.");
-        }
         String description = text.toLowerCase();
         int page = from / size;
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -178,9 +162,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentDto createComment(CommentDto commentDto, Long itemId, Long userId) {
-        if (commentDto.getText().isBlank()) {
-            throw new ValidationException("Пустой комментарий.");
-        }
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
             log.info("Не найден пользователь c id={}.", userId);
@@ -215,17 +196,6 @@ public class ItemServiceImpl implements ItemService {
         return commentD;
     }
 
-    public void validate(Item item) {
-        if (item.getName() == null || item.getName().isBlank()) {
-            throw new ValidationException("Поле name не может быть пустым.");
-        }
-        if (item.getDescription() == null || item.getDescription().isBlank()) {
-            throw new ValidationException("Поле description не может быть пустым.");
-        }
-        if (item.getAvailable() == null) {
-            throw new ValidationException("Поле available не может быть пустым.");
-        }
-    }
 
     private Booking findNext(List<Booking> bookings, LocalDateTime localDateTime) {
         return bookings.stream()

@@ -3,7 +3,6 @@ package ru.practicum.shareit.request.dto;
 import lombok.Data;
 import ru.practicum.shareit.item.model.Item;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -11,7 +10,6 @@ import java.util.List;
 @Data
 public class ItemRequestDto {
     private Long id;
-    @NotNull
     private String description;
     private Requestor requestor;
     private LocalDateTime created;

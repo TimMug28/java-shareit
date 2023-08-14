@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.exceptions.ValidateUtil;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -40,7 +39,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findUserById(Long id) {
-        ValidateUtil.validNumberNotNull(id, "id пользователя не должно быть null.");
         Optional<User> getUser = userRepository.findById(id);
         if (getUser.isEmpty()) {
             log.info("Не найден пользователь c id={}.", id);
@@ -51,7 +49,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void removeUserById(Long id) {
-        ValidateUtil.validNumberNotNull(id, "id пользователя не должно быть null.");
         userRepository.deleteById(id);
         log.info("Удалён пользователь c id={}.", id);
     }

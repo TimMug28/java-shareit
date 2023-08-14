@@ -10,7 +10,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
@@ -209,19 +208,6 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    void getAllRequestOtherUsersValidationExceptionTest() {
-        Throwable throwable = Assertions.catchThrowable(() ->
-                itemRequestService.getAllRequestOtherUsers(1L, -1, 0)
-        );
-
-        Assertions.assertThat(throwable)
-                .isInstanceOf(ValidationException.class)
-                .hasMessage("Неверный формат from или size.");
-
-        Mockito.verifyNoMoreInteractions(userRepository, itemRequestRepository);
-    }
-
-    @Test
     void getAllRequestOtherUsersNotFoundExceptionTest() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -235,26 +221,6 @@ class ItemRequestServiceImplTest {
 
         Mockito.verify(userRepository, Mockito.times(1)).findById(1L);
         Mockito.verifyNoMoreInteractions(userRepository, itemRequestRepository);
-    }
-
-    @Test
-    public void getItemRequestById_NullRequesterId_ThrowsValidationException() {
-        Long requesterId = null;
-        Long requestId = 1L;
-
-        assertThrows(ValidationException.class, () -> {
-            itemRequestService.getItemRequestById(requesterId, requestId);
-        });
-    }
-
-    @Test
-    public void getItemRequestById_NullRequestId_ThrowsValidationException() {
-        Long requesterId = 1L;
-        Long requestId = null;
-
-        assertThrows(ValidationException.class, () -> {
-            itemRequestService.getItemRequestById(requesterId, requestId);
-        });
     }
 
     @Test
@@ -286,26 +252,6 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    public void createRequest_NullId_ThrowsValidationException() {
-        ItemRequestDto itemRequestDto = new ItemRequestDto();
-        Long id = null;
-
-        assertThrows(ValidationException.class, () -> {
-            itemRequestService.createRequest(itemRequestDto, id);
-        });
-    }
-
-    @Test
-    public void createRequest_NegativeId_ThrowsValidationException() {
-        ItemRequestDto itemRequestDto = new ItemRequestDto();
-        Long id = -1L;
-
-        assertThrows(ValidationException.class, () -> {
-            itemRequestService.createRequest(itemRequestDto, id);
-        });
-    }
-
-    @Test
     public void createRequest_UserNotFound_ThrowsNotFoundException() {
         ItemRequestDto itemRequestDto = new ItemRequestDto();
         Long id = 1L;
@@ -316,20 +262,4 @@ class ItemRequestServiceImplTest {
             itemRequestService.createRequest(itemRequestDto, id);
         });
     }
-
-    @Test
-    public void createRequest_InvalidItemRequestDto_ThrowsValidationException() {
-        ItemRequestDto itemRequestDto = new ItemRequestDto();
-        Long id = 1L;
-
-        User user = new User();
-        user.setId(id);
-
-        when(userRepository.findById(id)).thenReturn(Optional.of(user));
-
-        assertThrows(ValidationException.class, () -> {
-            itemRequestService.createRequest(itemRequestDto, id);
-        });
-    }
-
 }

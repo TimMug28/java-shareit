@@ -56,20 +56,6 @@ public class UserControllerTest {
     }
 
     @Test
-    void createUserBadRequestTest() throws Exception {
-        UserDto invalidUserDto = new UserDto();
-        invalidUserDto.setName("");
-        invalidUserDto.setEmail("неверный_email");
-
-        mockMvc.perform(post("/users")
-                        .content(objectMapper.writeValueAsString(invalidUserDto))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void findAllUsersTest() throws Exception {
         List<UserDto> userList = new ArrayList<>();
         userList.add(userDto);
@@ -103,8 +89,8 @@ public class UserControllerTest {
     @Test
     void removeUserTest() throws Exception {
         mockMvc.perform(delete("/users/{id}", userId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON));
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
 
         Mockito.verify(userService, Mockito.times(1)).removeUserById(userId);
     }

@@ -62,7 +62,12 @@ public class BookingController {
             @RequestParam(defaultValue = "20") int size
     ) {
         checkPaging(from, size);
-        return bookingClient.findBookingUsers(state, userId, from, size);
+        try {
+            StateEnum status = StateEnum.valueOf(state);
+            return bookingClient.findBookingUsers(state, userId, from, size);
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+        }
     }
 
     @GetMapping("/owner")
@@ -73,7 +78,12 @@ public class BookingController {
             @RequestParam(defaultValue = "20") int size
     ) {
         checkPaging(from, size);
-        return bookingClient.getOwnerBookings(userId, state, from, size);
+        try {
+            StateEnum status = StateEnum.valueOf(state);
+            return bookingClient.getOwnerBookings(userId, state, from, size);
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+        }
     }
 }
 
